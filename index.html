@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8">
+<title>Quizly | نمونه سوالات مشاوره طلاق</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Vazirmatn', sans-serif;
+  background: linear-gradient(135deg, #f3f0ff, #e6dcff);
+  min-height: 100vh;
+  color: #2f2f2f;
+}
+
+/* ---------- Header ---------- */
+header {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #4b3b74;
+}
+
+header p {
+  margin-top: 10px;
+  color: #5f5488;
+  font-size: 1rem;
+}
+
+/* ---------- Quiz List ---------- */
+.quiz-list {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 0 20px;
+  display: grid;
+  gap: 20px;
+}
+
+.quiz-card {
+  background: white;
+  border-radius: 18px;
+  padding: 22px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+  transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.quiz-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 35px rgba(0,0,0,0.15);
+}
+
+.quiz-info h3 {
+  font-size: 1.1rem;
+  color: #3e2f63;
+}
+
+.quiz-info span {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.9rem;
+  color: #777;
+}
+
+/* ---------- Button ---------- */
+.quiz-card a {
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #7a5cff, #a56eff);
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: filter 0.2s, transform 0.2s;
+}
+
+.quiz-card a:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+}
+
+/* ---------- Footer ---------- */
+footer {
+  text-align: center;
+  padding: 30px 20px 20px;
+  color: #7c3aed;
+  font-size: 0.9rem;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>نمونه سوالات مشاوره طلاق</h1>
+  <p>کوییزهای چهارگزینه‌ای برای آمادگی امتحان</p>
+</header>
+
+<main class="quiz-list">
+
+  <div class="quiz-card">
+    <div class="quiz-info">
+      <h3>Quiz 1</h3>
+      <span>مبانی مشاوره طلاق</span>
+    </div>
+    <a href="quiz1.html">شروع آزمون</a>
+  </div>
+
+  <div class="quiz-card">
+    <div class="quiz-info">
+      <h3>Quiz 2</h3>
+      <span>ارزیابی تعارضات زناشویی</span>
+    </div>
+    <a href="quiz2.html">شروع آزمون</a>
+  </div>
+
+  <div class="quiz-card">
+    <div class="quiz-info">
+      <h3>Quiz 3</h3>
+      <span>مداخلات درمانی در طلاق</span>
+    </div>
+    <a href="quiz3.html">شروع آزمون</a>
+  </div>
+
+</main>
+
+<footer>
+  Quizly • Divorce Counseling
+</footer>
+
+</body>
+</html>
