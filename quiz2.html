@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<title>Advanced Quiz Engine</title>
+
+<style>
+:root{
+  --bg:#f8fafc;
+  --card:#ffffff;
+  --text:#020617;
+  --muted:#64748b;
+  --primary:#fa4779;
+  --success:#7cd3b5;
+  --danger:#f66d94;
+  --option:#e5e7eb;
+}
+body.dark{
+  --bg:#020617;
+  --card:#0f172a;
+  --text:#e5e7eb;
+  --muted:#94a3b8;
+  --option:#1e293b;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-family:Vazirmatn,Tahoma;
+  background:var(--bg);
+  color:var(--text);
+}
+.card{
+  width:94%;
+  max-width:560px;
+  background:var(--card);
+  border-radius:20px;
+  padding:28px;
+  box-shadow:0 12px 40px rgba(0,0,0,.18);
+}
+.progress{
+  height:12px;
+  background:var(--option);
+  border-radius:999px;
+  overflow:hidden;
+  margin-bottom:16px;
+}
+.progress-bar{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#fa4779,#ff80b3);
+  transition:.35s ease;
+}
+#counter{
+  font-size:14px;
+  color:var(--muted);
+  margin-bottom:14px;
+}
+.question{
+  font-size:21px;
+  font-weight:500;
+  margin-bottom:20px;
+}
+.options button{
+  width:100%;
+  margin:8px 0;
+  padding:14px;
+  border:none;
+  border-radius:14px;
+  background:var(--option);
+  color:var(--text);
+  cursor:pointer;
+  font-size:15px;
+  transition:.25s;
+}
+.options button:hover{transform:scale(1.01)}
+.correct{background:var(--success)!important;color:#fff}
+.incorrect{background:var(--danger)!important;color:#fff}
+.footer{
+  display:flex;
+  justify-content:space-between;
+  margin-top:22px;
+}
+.btn{
+  background:var(--primary);
+  color:#fff;
+  border:none;
+  border-radius:14px;
+  padding:10px 20px;
+  font-size:14px;
+  cursor:pointer;
+}
+#result{
+  margin-top:24px;
+  font-size:22px;
+  font-weight:600;
+  text-align:center;
+  line-height:1.8;
+}
+.grade{
+  font-size:40px;
+  font-weight:800;
+}
+.pass{color:var(--success)}
+.fail{color:var(--danger)}
+</style>
+</head>
+
+<body>
+<div class="card">
+  <div class="progress"><div class="progress-bar" id="progress"></div></div>
+  <div id="counter"></div>
+  <div id="quiz"></div>
+  <div class="footer">
+    <button class="btn" onclick="toggleMode()">🌗 حالت</button>
+    <button class="btn" id="nextBtn" onclick="next()">بعدی</button>
+  </div>
+  <div id="result"></div>
+</div>
+
+<script>
+const questions=[
+  {q:"بر اساس برآوردها چه میزان از ازدواج‌ها به طلاق می‌انجامد؟",options:["دو سوم","نیمی","سه چهارم","یک چهارم"],answer:1},
+  {q:"کدام جمله صحیح است؟",options:["پیامدهای منفی طلاق اجباری و توافقی برابر است","پیامدهای منفی طلاق اجباری بیشتر است","پیامدهای منفی طلاق اجباری کمتر است","پیامدهای مثبت طلاق اجباری و توافقی برابر است"],answer:1},
+  {q:"سومین مرحله گذار از فرآیند طلاق از نظر بوهانان کدام است؟",options:["تدارکاتی","عاطفی","قانونی","اجتماعی"],answer:0},
+  {q:"آشکارترین جنبه‌ی طلاق کدام است؟",options:["اقتصادی","عاطفی","قانونی","والدینی"],answer:2},
+  {q:"کدامیک جزء عوامل درونی طلاق است؟",options:["مشکلات همسر","خانواده","مزاج","فرهنگ"],answer:1},
+  {q:"از نظر کوبلر-راس آخرین واکنش در پاسخ به طلاق کدام است؟",options:["پذیرش","انکار","افسردگی","خشم"],answer:0},
+  {q:"کدامیک از فنون پیشنهادی در مرحله خشم است؟",options:["همدلی","صندلی خالی","عادی‌سازی","مواجهه"],answer:1},
+  {q:"پسرفت عاطفی در برخی کودکان طلاق به چه معناست؟",options:["ترس و اضطراب","بازگشت","غم و اندوه","خشم"],answer:1},
+  {q:"کدام جمله صحیح است؟",options:["افراد مذهبی سخت‌تر کنار می‌آیند","افراد مذهبی آسان‌تر کنار می‌آیند","طلاق برای زندگی پرتنش دردناک است","طلاق برای زندگی رضایت‌بخش رهایی است"],answer:1},
+  {q:"منظور از ارتباط زوج‌ها پس از طلاق چه نوع رابطه‌ای است؟",options:["عاطفی","اجتماعی معمول","عاشقانه","دوستانه"],answer:1},
+  {q:"در کدام روابط پس از طلاق افراد با زندگی گذشته اشتغال ذهنی دارند؟",options:["خصمانه","وسواس‌گونه","دوستانه","عاشقانه"],answer:1},
+  {q:"آماده‌سازی فرد برای سوگواری و طلاق عاطفی در کدام مرحله مشاوره‌ای است؟",options:["آغازین","میانی","پایانی","قبل شروع"],answer:1},
+  {q:"در این فن، بیمار دوست یا عزیزش را در وضعیت مشابه تصور می‌کند و توصیه می‌دهد. این فن چیست؟",options:["سود و زیان","معیار دوگانه","دورنما","مواجهه"],answer:1},
+  {q:"دومین شاخص پختگی عاطفی و شخصیتی افراد کدام است؟",options:["توانایی حل مسئله","سازگاری","کنترل خشم و هیجانات","هماهنگی توانایی‌ها با سن"],answer:2},
+  {q:"در چه موردی خطر جدی است و بیمار باید بستری شود؟",options:["خودزنی","خودکشی","افسردگی شدید","بی‌خوابی"],answer:1},
+  {q:"اگر ادامه زندگی و جدایی مزایا و معایب یکسان داشته باشند، مراجع به چه چیزی رجوع می‌کند؟",options:["والدین","مشاور","منطق","قلب"],answer:2},
+  {q:"کدام مورد سبب می‌شود مراجعان از هیجان‌های منفی رها شوند و آماده سازگاری شوند؟",options:["تقویت خودآگاهی","تحمل هیجان‌های منفی","تقویت منابع مقابله‌ای","بخشش"],answer:3},
+  {q:"یکی از مهارت‌های مهم مشاوره‌ای همراه با توجه و تماس چشمی چیست؟",options:["تسهیل","گوش دادن","سؤال کردن","عادی‌سازی"],answer:1},
+  {q:"وقتی مشاور حدس می‌زند مراجع رفتاری را پنهان می‌کند، از چه فنی استفاده می‌کند؟",options:["اختصاصی کردن","اطمینان‌بخشی","انتظار علامت","همدلی"],answer:2},
+  {q:"کدام کار به مراجع کمک می‌کند دیدگاه جدیدی پیدا کند؟",options:["صندلی خالی","قاب‌گیری","همدلی","آشکارسازی"],answer:1},
+  {q:"مشاور برای مطمئن شدن از فهم مراجع از چه فن استفاده می‌کند؟",options:["تفسیر","کاوش","وارسی","تعمیم"],answer:2},
+  {q:"کدام نوع گذار به ندرت استفاده می‌شود مگر در زمان کم؟",options:["ارجاعی","ناگهانی","ملایم","موقت"],answer:1},
+  {q:"در کدام نوع آرمیدگی هر عضله تنها رها می‌شود؟",options:["بدون تنش","عضلانی پیشرونده","عضلانی پس‌رونده","موقت"],answer:0},
+  {q:"مجموعه فنونی که به تغییر افکار منفی کمک می‌کند چه نام دارد؟",options:["بازسازی رفتاری","بازسازی شناختی","بازسازی تعاملی","بازسازی ترکیبی"],answer:1},
+  {q:"در این نوع حضانت کودک فقط حق زندگی با یکی از والدین دارد؟",options:["قانونی","مشترک","مجزا","منفرد"],answer:3},
+  {q:"در کدام تحریف شناختی فرد تنها خود را مسئول می‌داند؟",options:["فاجعه‌سازی","نادیده گرفتن مثبت‌ها","شخصی‌سازی","برچسب‌زنی"],answer:2},
+  {q:"کدام موارد همیشه در قالب جملات «باید» ظاهر می‌شوند؟",options:["نگرش‌ها","فرض‌ها","گزاره‌ها","اهداف"],answer:0},
+  {q:"نشانه‌ای از اینکه طلاق عاطفی اتفاق نیفتاده چیست؟",options:["افسردگی","خشم","انکار","احساس گناه"],answer:2},
+  {q:"چهارمین مرحله بخشش چیست؟",options:["اقدام به بخشش","کشف معنای رنج","آگاهی از رنجش","تصمیم‌گیری برای بخشش"],answer:3},
+  {q:"روش‌هایی که فرد را به هدف می‌رسانند چه نام دارند؟",options:["مهارت‌ها","راهبردها","قواعد","اهداف"],answer:1}
+];
+
+
+const state={index:0,score:0};
+const quiz=document.getElementById("quiz");
+const counter=document.getElementById("counter");
+const progress=document.getElementById("progress");
+const result=document.getElementById("result");
+const nextBtn=document.getElementById("nextBtn");
+
+function render(){
+  const q=questions[state.index];
+  quiz.innerHTML=`
+    <div class="question">${q.q}</div>
+    <div class="options">
+      ${q.options.map((o,i)=>`<button onclick="answer(${i})">${o}</button>`).join("")}
+    </div>
+  `;
+  counter.textContent=`سؤال ${state.index+1} از ${questions.length}`;
+  progress.style.width=(state.index/questions.length*100)+"%";
+  nextBtn.style.display="none";
+}
+
+function answer(i){
+  const q=questions[state.index];
+  const buttons=document.querySelectorAll(".options button");
+  buttons.forEach(b=>b.disabled=true);
+  if(i===q.answer){
+    buttons[i].classList.add("correct");
+    state.score++;
+  }else{
+    buttons[i].classList.add("incorrect");
+    buttons[q.answer].classList.add("correct");
+  }
+  nextBtn.style.display="inline-block";
+}
+
+function next(){
+  state.index++;
+  state.index<questions.length ? render() : finish();
+}
+
+function finish(){
+  quiz.innerHTML="";
+  counter.textContent="";
+  progress.style.width="100%";
+
+  const percent=Math.round(state.score/questions.length*100);
+  const grade=(state.score/questions.length*20).toFixed(1);
+  const status=grade>=10?"pass":"fail";
+  const label=grade>=17?"عالی":grade>=14?"خیلی خوب":grade>=10?"قبول":"مردود";
+
+  result.innerHTML=`
+    <div class="grade ${status}">${grade} / ۲۰</div>
+    <div>${label}</div>
+    <div>درصد پاسخ صحیح: ${percent}٪</div>
+  `;
+}
+
+function toggleMode(){
+  document.body.classList.toggle("dark");
+}
+
+render();
+</script>
+</body>
+</html>
