@@ -1,221 +1,0 @@
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-<meta charset="UTF-8" />
-<title>Advanced Quiz Engine</title>
-
-<style>
-:root{
-  --bg:#f8fafc;
-  --card:#ffffff;
-  --text:#020617;
-  --muted:#64748b;
-  --primary:#fa4779;
-  --success:#7cd3b5;
-  --danger:#f66d94;
-  --option:#e5e7eb;
-}
-body.dark{
-  --bg:#020617;
-  --card:#0f172a;
-  --text:#e5e7eb;
-  --muted:#94a3b8;
-  --option:#1e293b;
-}
-*{box-sizing:border-box}
-body{
-  margin:0;
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-family:Vazirmatn,Tahoma;
-  background:var(--bg);
-  color:var(--text);
-}
-.card{
-  width:94%;
-  max-width:560px;
-  background:var(--card);
-  border-radius:20px;
-  padding:28px;
-  box-shadow:0 12px 40px rgba(0,0,0,.18);
-}
-.progress{
-  height:12px;
-  background:var(--option);
-  border-radius:999px;
-  overflow:hidden;
-  margin-bottom:16px;
-}
-.progress-bar{
-  height:100%;
-  width:0%;
-  background:linear-gradient(90deg,#fa4779,#ff80b3);
-  transition:.35s ease;
-}
-#counter{
-  font-size:14px;
-  color:var(--muted);
-  margin-bottom:14px;
-}
-.question{
-  font-size:21px;
-  font-weight:500;
-  margin-bottom:20px;
-}
-.options button{
-  width:100%;
-  margin:8px 0;
-  padding:14px;
-  border:none;
-  border-radius:14px;
-  background:var(--option);
-  color:var(--text);
-  cursor:pointer;
-  font-size:15px;
-  transition:.25s;
-}
-.options button:hover{transform:scale(1.01)}
-.correct{background:var(--success)!important;color:#fff}
-.incorrect{background:var(--danger)!important;color:#fff}
-.footer{
-  display:flex;
-  justify-content:space-between;
-  margin-top:22px;
-}
-.btn{
-  background:var(--primary);
-  color:#fff;
-  border:none;
-  border-radius:14px;
-  padding:10px 20px;
-  font-size:14px;
-  cursor:pointer;
-}
-#result{
-  margin-top:24px;
-  font-size:22px;
-  font-weight:600;
-  text-align:center;
-  line-height:1.8;
-}
-.grade{
-  font-size:40px;
-  font-weight:800;
-}
-.pass{color:var(--success)}
-.fail{color:var(--danger)}
-</style>
-</head>
-
-<body>
-<div class="card">
-  <div class="progress"><div class="progress-bar" id="progress"></div></div>
-  <div id="counter"></div>
-  <div id="quiz"></div>
-  <div class="footer">
-    <button class="btn" onclick="toggleMode()">🌗 حالت</button>
-    <button class="btn" id="nextBtn" onclick="next()">بعدی</button>
-  </div>
-  <div id="result"></div>
-</div>
-
-<script>
-const questions=[
-  {q:"کاهش پیوندهای هیجانی بین زوج‌ها چه نام دارد؟",options:["طلاق قانونی","طلاق عاطفی","طلاق اجتماعی","طلاق روانی"],answer:1},
-  {q:"وقتی مراجع اهداف خود را با دوستان نزدیک مطرح می‌کند از کدام فن استفاده کرده است؟",options:["فن نظرسنجی","اهداف بلندمدت","سرگرم کردن خود","فن مقابله با استرس"],answer:0},
-  {q:"طلاق در سال‌های اول زندگی (زیر 5 تا 7 سال) بیشتر ناشی از چیست؟",options:["فقدان صمیمیت","بحران خاص","کمبود رابطه جنسی","کشمکش زیاد"],answer:2},
-  {q:"بدبینی، زودرنجی، وابستگی شدید به خانواده مربوط به کدام علت طلاق است؟",options:["ویژگی‌های شخصیتی","بی‌وفایی و خیانت","کاهش دلبستگی","همسر ناکارآمد"],answer:0},
-  {q:"فاصله سنی مناسب بین زوج‌ها حداکثر چقدر است؟",options:["10 تا 12 سال","7 تا 8 سال","1 تا 2 سال","10 تا 11 سال"],answer:1},
-  {q:"ازدواج زیر چه سنی احتمال طلاق بیشتری دارد؟",options:["زیر 25 سال","زیر 22 سال","زیر 20 سال","زیر 18 سال"],answer:3},
-  {q:"کدام مورد از عوامل درونی طلاق نیست؟",options:["مزاج","بیماری‌های جسمانی","بیماری‌های روانی","فرهنگ"],answer:3},
-  {q:"کدام مورد از عوامل بیرونی طلاق است؟",options:["مزاج","بیماری‌های جسمانی","بیماری‌های روانی","فرهنگ"],answer:3},
-  {q:"احساس تهی بودن، فقدان انرژی، لذت نبردن و تحریک‌پذیری نشانه چیست؟",options:["افسردگی","وسواس","اضطراب","دوقطبی"],answer:0},
-  {q:"آخرین مرحله در فرآیند طلاق کدام است؟",options:["شوک","پذیرش","انکار","خشم"],answer:1},
-  {q:"کودکان در چه سنی اغلب به جدایی والدین با خشم واکنش نشان می‌دهند؟",options:["9 تا 11 سال","5 تا 7 سال","6 تا 8 سال","2 تا 4 سال"],answer:0},
-  {q:"واکنش‌های شایع نوجوانان به طلاق والدین چیست؟",options:["خشم","غم و اندوه","اضطراب","شب‌ادراری"],answer:1},
-  {q:"فقدان پدر در پسران باعث چه مشکلی می‌شود؟",options:["افسردگی","اضطراب","پرخاشگری","وسواس"],answer:2},
-  {q:"فقدان پدر در دختران باعث چه مشکلی می‌شود؟",options:["افسردگی","پرخاشگری","رفتار ضد اجتماعی","تخریبگری"],answer:1},
-  {q:"داشتن کار، درآمد، وکیل و مسکن چه نام دارد؟",options:["حمایت شخصی","حمایت خانوادگی","حمایت عاطفی","حمایت اجتماعی"],answer:3},
-  {q:"مشاوره طلاق معمولاً چند جلسه طول می‌کشد؟",options:["30 جلسه","4 جلسه","6 تا 14 جلسه","6 تا 8 جلسه"],answer:2},
-  {q:"آماده‌سازی فرد برای سوگواری و طلاق عاطفی مربوط به کدام مرحله مشاوره است؟",options:["سازش","آغازین","میانی","پایانی"],answer:1},
-  {q:"تغییر افکار و باورهای ناکارآمد مربوط به کدام راهبرد مشاوره است؟",options:["دارودرمانی","راهبردهای شناختی","راهبردهای اجتماعی","راهبردهای رفتاری"],answer:1},
-  {q:"در چه مرحله مشاور و مراجع به اهداف درمانی دست پیدا می‌کنند؟",options:["اول","دوم","وسط","پایان"],answer:3},
-  {q:"همراه بودن با مراجع و نگاه از دریچه چشم او چه نام دارد؟",options:["همدلی","همدردی","رشد شناختی","رشد اقتصادی"],answer:0},
-  {q:"فن هیجانی مهم برای تخلیه عاطفی زوج‌ها چیست؟",options:["عادی‌سازی","صندلی خالی","خلاصه کردن","مواجهه"],answer:1},
-  {q:"آرمیدگی عضلانی یکی از فنون کلیدی برای کسب چه چیزی است؟",options:["آرامش","کاهش اضطراب","کنترل خشم","کاهش افسردگی"],answer:0},
-  {q:"خود را جای فرد آزارگر گذاشتن چه نام دارد؟",options:["همدردی","همدلی","پذیرش رنج","یافتن معنا در زندگی"],answer:2},
-  {q:"آگاهی از جنبه‌های جسمانی، روانی و رفتاری خود چه نام دارد؟",options:["همکاری","همدردی","مهارت خودآگاهی","پذیرش رنج"],answer:2},
-  {q:"برداشت و تصور فرد از خود چه نام دارد؟",options:["همکاری","همدردی","خودپنداره","فن مقابله با استرس"],answer:2},
-  {q:"وقتی توجه فرد از هیجانات دردناک به سوی دیگر هیجانات معطوف می‌شود از چه راهبردی استفاده شده؟",options:["توجه‌گردانی","همدلی","تصمیم‌گیری","ارتباط برقرار کردن"],answer:0},
-  {q:"تنفس دیافراگمی از فنون چه چیزی است؟",options:["آرمیدگی","همدلی","شناختی","ارتباط"],answer:0},
-  {q:"وقتی کودک زمان خود را جداگانه و مساوی با هر والد می‌گذراند مربوط به کدام حضانت است؟",options:["منفرد","مجزا","مشترک","شخصی"],answer:2},
-  {q:"آشکارترین جنبه طلاق کدام است؟",options:["قانونی","عاطفی","اجتماعی","روانی"],answer:0}
-];
-
-
-const state={index:0,score:0};
-const quiz=document.getElementById("quiz");
-const counter=document.getElementById("counter");
-const progress=document.getElementById("progress");
-const result=document.getElementById("result");
-const nextBtn=document.getElementById("nextBtn");
-
-function render(){
-  const q=questions[state.index];
-  quiz.innerHTML=`
-    <div class="question">${q.q}</div>
-    <div class="options">
-      ${q.options.map((o,i)=>`<button onclick="answer(${i})">${o}</button>`).join("")}
-    </div>
-  `;
-  counter.textContent=`سؤال ${state.index+1} از ${questions.length}`;
-  progress.style.width=(state.index/questions.length*100)+"%";
-  nextBtn.style.display="none";
-}
-
-function answer(i){
-  const q=questions[state.index];
-  const buttons=document.querySelectorAll(".options button");
-  buttons.forEach(b=>b.disabled=true);
-  if(i===q.answer){
-    buttons[i].classList.add("correct");
-    state.score++;
-  }else{
-    buttons[i].classList.add("incorrect");
-    buttons[q.answer].classList.add("correct");
-  }
-  nextBtn.style.display="inline-block";
-}
-
-function next(){
-  state.index++;
-  state.index<questions.length ? render() : finish();
-}
-
-function finish(){
-  quiz.innerHTML="";
-  counter.textContent="";
-  progress.style.width="100%";
-
-  const percent=Math.round(state.score/questions.length*100);
-  const grade=(state.score/questions.length*20).toFixed(1);
-  const status=grade>=10?"pass":"fail";
-  const label=grade>=17?"عالی":grade>=14?"خیلی خوب":grade>=10?"قبول":"مردود";
-
-  result.innerHTML=`
-    <div class="grade ${status}">${grade} / ۲۰</div>
-    <div>${label}</div>
-    <div>درصد پاسخ صحیح: ${percent}٪</div>
-  `;
-}
-
-function toggleMode(){
-  document.body.classList.toggle("dark");
-}
-
-render();
-</script>
-</body>
-</html>
