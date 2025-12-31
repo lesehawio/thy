@@ -1,10 +1,9 @@
 <!DOCTYPE html>
-<html lang="fa">
+<html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>Quizly | نمونه سوالات مشاوره طلاق</title>
+<title>Quizly | آزمون‌های درمانی</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700&display=swap" rel="stylesheet">
 
 <style>
@@ -12,89 +11,158 @@
 
 body {
   font-family: 'Vazirmatn', sans-serif;
-  background: linear-gradient(135deg, #f3f0ff, #e6dcff);
   min-height: 100vh;
-  color: #2f2f2f;
+  background:
+    radial-gradient(circle at top right, rgba(250,71,121,0.25), transparent 45%),
+    radial-gradient(circle at bottom left, rgba(250,71,121,0.18), transparent 45%),
+    linear-gradient(135deg, #fff1f5, #ffe4ec);
+  color: #3a0f1f;
 }
 
 /* ---------- Header ---------- */
 header {
-  padding: 40px 20px;
   text-align: center;
+  padding: 40px 20px 20px;
+  background: linear-gradient(135deg, #fff1f5, #ffe4ec);
+  position: relative;
+}
+
+.logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo {
+  width: 160px;
+  height: auto;
+  border-radius: 24px;
+  box-shadow: 0 10px 35px rgba(250, 71, 121, 0.5), 0 0 12px rgba(250, 71, 121, 0.35) inset;
+  animation: logoPulse 3s ease-in-out infinite;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+.logo:hover {
+  transform: scale(1.15) rotate(-3deg);
+  box-shadow: 0 20px 55px rgba(250, 71, 121, 0.7), 0 0 22px rgba(250, 71, 121, 0.45) inset;
+}
+
+@keyframes logoPulse {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.05) rotate(2deg); }
 }
 
 header h1 {
   font-size: 2rem;
   font-weight: 700;
-  color: #4b3b74;
+  background: linear-gradient(135deg, #fa4779, #ff7aa2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 header p {
-  margin-top: 10px;
-  color: #5f5488;
-  font-size: 1rem;
+  margin-top: 6px;
+  font-size: 0.95rem;
+  color: #7a2a43;
 }
 
-/* ---------- Quiz List ---------- */
+/* ---------- Wrapper ---------- */
+.quiz-wrapper {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 20px 40px;
+}
+
+/* ---------- Scroll ---------- */
+.quiz-scroll {
+  max-height: 460px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.quiz-scroll::-webkit-scrollbar {
+  width: 7px;
+}
+.quiz-scroll::-webkit-scrollbar-thumb {
+  background: linear-gradient(#fa4779, #ff8fb1);
+  border-radius: 10px;
+}
+
+/* ---------- List ---------- */
 .quiz-list {
-  max-width: 800px;
-  margin: 40px auto;
-  padding: 0 20px;
-  display: grid;
-  gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
+/* ---------- Card ---------- */
 .quiz-card {
-  background: white;
+  position: relative;
+  background: rgba(255,255,255,0.65);
+  backdrop-filter: blur(10px);
   border-radius: 18px;
-  padding: 22px 25px;
+  padding: 22px 26px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-  transition: transform 0.25s, box-shadow 0.25s;
+  box-shadow:
+    0 12px 30px rgba(250,71,121,0.18),
+    inset 0 0 0 1px rgba(255,255,255,0.5);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+}
+
+/* نور ملایم */
+.quiz-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent 30%,
+    rgba(255,255,255,0.65),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.quiz-card:hover::before {
+  opacity: 1;
 }
 
 .quiz-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 14px 35px rgba(0,0,0,0.15);
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 22px 45px rgba(250,71,121,0.35);
 }
 
 .quiz-info h3 {
   font-size: 1.1rem;
-  color: #3e2f63;
-}
-
-.quiz-info span {
-  display: block;
-  margin-top: 6px;
-  font-size: 0.9rem;
-  color: #777;
+  font-weight: 700;
+  color: #5c102b;
 }
 
 /* ---------- Button ---------- */
 .quiz-card a {
   text-decoration: none;
-  padding: 10px 20px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, #7a5cff, #a56eff);
-  color: white;
+  padding: 10px 26px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fa4779, #ff7aa2);
+  color: #fff;
   font-weight: 600;
-  font-size: 0.95rem;
-  transition: filter 0.2s, transform 0.2s;
+  font-size: 0.9rem;
+  box-shadow: 0 6px 18px rgba(250,71,121,0.45);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s;
 }
 
 .quiz-card a:hover {
-  filter: brightness(1.1);
-  transform: translateY(-2px);
+  filter: brightness(1.06);
 }
 
-/* ---------- Footer ---------- */
-footer {
-  text-align: center;
-  padding: 30px 20px 20px;
-  color: #7c3aed;
-  font-size: 0.9rem;
+.quiz-card a:active {
+  transform: translateY(2px);
+  box-shadow: 0 3px 10px rgba(250,71,121,0.3);
 }
 </style>
 </head>
@@ -102,41 +170,41 @@ footer {
 <body>
 
 <header>
-  <h1>نمونه سوالات مشاوره طلاق</h1>
-  <p>کوییزهای چهارگزینه‌ای برای آمادگی امتحان</p>
+  <div class="logo-container">
+    <img src="https://uploadkon.ir/uploads/7e2d29_25Quizly.png" alt="Quizly Logo" class="logo">
+    <h1>آزمون های نظریه مشاوره و روان درمانی 1</h1>
+    <p>نگران چیزی نباش با این سوالا 80 درصد راه و رفتی</p>
+  </div>
 </header>
 
-<main class="quiz-list">
+<main class="quiz-wrapper">
+  <div class="quiz-scroll">
+    <div class="quiz-list">
 
-  <div class="quiz-card">
-    <div class="quiz-info">
-      <h3>Quiz 1</h3>
-      <span>مبانی مشاوره طلاق</span>
+      <div class="quiz-card"><div class="quiz-info"><h3>Quiz 1</h3></div><a href="therapy/quiz1.html">شروع آزمون</a></div>
+      <div class="quiz-card"><div class="quiz-info"><h3>Quiz 2</h3></div><a href="therapy/quiz2.html">شروع آزمون</a></div>
+      <div class="quiz-card"><div class="quiz-info"><h3>Quiz 3</h3></div><a href="therapy/quiz3.html">شروع آزمون</a></div>
+      <div class="quiz-card"><div class="quiz-info"><h3>Quiz 4</h3></div><a href="therapy/quiz4.html">شروع آزمون</a></div>
+      <div class="quiz-card"><div class="quiz-info"><h3>Quiz 5</h3></div><a href="therapy/quiz5.html">شروع آزمون</a></div>
+      <div class="quiz-card"><div class="quiz-info"><h3>Quiz 6</h3></div><a href="therapy/quiz6.html">شروع آزمون</a></div>
+      <div class="quiz-card"><div class="quiz-info"><h3>Quiz 7</h3></div><a href="therapy/quiz7.html">شروع آزمون</a></div>
+      <div class="quiz-card"><div class="quiz-info"><h3>Quiz 8</h3></div><a href="therapy/quiz8.html">شروع آزمون</a></div>
+      <div class="quiz-card"><div class="quiz-info"><h3>Quiz 9</h3></div><a href="therapy/quiz9.html">شروع آزمون</a></div>
+      <div class="quiz-card"><div class="quiz-info"><h3>Quiz 10</h3></div><a href="therapy/quiz10.html">شروع آزمون</a></div>
+      <div class="quiz-card"><div class="quiz-info"><h3>Quiz 11</h3></div><a href="therapy/quiz11.html">شروع آزمون</a></div>
+      <div class="quiz-card"><div class="quiz-info"><h3>Quiz 12</h3></div><a href="therapy/quiz12.html">شروع آزمون</a></div>
+      <div class="quiz-card"><div class="quiz-info"><h3>Quiz 13</h3></div><a href="therapy/quiz13.html">شروع آزمون</a></div>
+      <div class="quiz-card"><div class="quiz-info"><h3>Quiz 14</h3></div><a href="therapy/quiz14.html">شروع آزمون</a></div>
+      <div class="quiz-card"><div class="quiz-info"><h3>Quiz 15</h3></div><a href="therapy/quiz15.html">شروع آزمون</a></div>
+      <div class="quiz-card"><div class="quiz-info"><h3>Quiz 16</h3></div><a href="therapy/quiz16.html">شروع آزمون</a></div>
+      <div class="quiz-card"><div class="quiz-info"><h3>Quiz 17</h3></div><a href="therapy/quiz17.html">شروع آزمون</a></div>
+      <div class="quiz-card"><div class="quiz-info"><h3>Quiz 18</h3></div><a href="therapy/quiz18.html">شروع آزمون</a></div>
+      <div class="quiz-card"><div class="quiz-info"><h3>Quiz 19</h3></div><a href="therapy/quiz19.html">شروع آزمون</a></div>
+      <div class="quiz-card"><div class="quiz-info"><h3>Quiz 20</h3></div><a href="therapy/quiz20.html">شروع آزمون</a></div>
+
     </div>
-    <a href="quiz1.html">شروع آزمون</a>
   </div>
-
-  <div class="quiz-card">
-    <div class="quiz-info">
-      <h3>Quiz 2</h3>
-      <span>ارزیابی تعارضات زناشویی</span>
-    </div>
-    <a href="quiz2.html">شروع آزمون</a>
-  </div>
-
-  <div class="quiz-card">
-    <div class="quiz-info">
-      <h3>Quiz 3</h3>
-      <span>مداخلات درمانی در طلاق</span>
-    </div>
-    <a href="quiz3.html">شروع آزمون</a>
-  </div>
-
 </main>
-
-<footer>
-  Quizly • Divorce Counseling
-</footer>
 
 </body>
 </html>
