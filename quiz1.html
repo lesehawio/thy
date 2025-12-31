@@ -1,220 +1,431 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<title>Advanced Quiz Engine</title>
+    <meta charset="UTF-8">
+    <title>آزمون – حالت پاسخنامه</title>
+    <style>
+        :root {
+            --pink: #fa4779;
+            --pink2: #ff7aa6;
+            --pink-soft: rgba(250, 71, 121, 0.12);
+            --bg: #f6f7fb;
+            --card: #ffffff;
+            --text: #0f172a;
+            --border: #e5e7eb;
+            --correct: #7fd1b9;
+        }
+        body.dark {
+            --bg: #0b1020;
+            --card: #131a33;
+            --text: #e5e7eb;
+            --border: #263056;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: 'Vazirmatn', Tahoma, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .theme-toggle {
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            z-index: 10;
+        }
+        .wrapper {
+            max-width: 1200px;
+            margin: 70px auto;
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            gap: 26px;
+        }
+        .card, .sheet {
+            background: var(--card);
+            border-radius: 28px;
+            padding: 28px;
+            box-shadow: 0 25px 55px rgba(0, 0, 0, 0.18);
+        }
+        .progress-wrap {
+            height: 12px;
+            background: linear-gradient(90deg, #eee, #ddd);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-bottom: 28px;
+        }
+        .progress {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(135deg, var(--pink), var(--pink2));
+            transition: .4s;
+        }
+        .question {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 28px;
+        }
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+        .option {
+            padding: 18px;
+            border-radius: 22px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+            transition: background .3s, border-color .3s;
+        }
+        .option:hover {
+            background: var(--pink-soft);
+            border-color: var(--pink);
+        }
+        .next {
+            margin-top: 28px;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 22px;
+            background: linear-gradient(135deg, var(--pink), var(--pink2));
+            color: #fff;
+            cursor: pointer;
+            display: none;
+            font-size: 16px;
+            transition: background .3s;
+        }
+        .next:hover {
+            background: var(--pink2);
+        }
+        .sheet {
+            max-height: 620px;
+            overflow: auto;
+        }
+        .sheet-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+        .sheet-cell {
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 12px;
+            display: grid;
+            grid-template-columns: 32px 1fr;
+            gap: 10px;
+        }
+        .sheet-cell.active {
+            border-color: var(--pink);
+            box-shadow: 0 0 0 3px var(--pink-soft);
+        }
+        .answers {
+            display: flex;
+            justify-content: space-between;
+        }
+        .bubble {
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 13px;
+        }
+        .correct {
+            background: var(--correct);
+            color: #fff;
+            border: none;
+        }
+        .wrong {
+            background: var(--pink);
+            color: #fff;
+            border: none;
+        }
+        .result {
+            text-align: center;
+            margin-top: 40px;
+        }
+        .score {
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--pink);
+        }
+        .desc {
+            margin-top: 10px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .print {
+            margin-top: 24px;
+            padding: 14px 34px;
+            border-radius: 999px;
+            border: none;
+            background: #111;
+            color: #fff;
+            cursor: pointer;
+            font-size: 15px;
+            transition: background .3s;
+        }
+        .print:hover {
+            background: #333;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .table th, .table td {
+            border: 1px solid var(--border);
+            padding: 10px;
+            text-align: center;
+        }
+        .table th {
+            background: var(--pink);
+            color: #fff;
+        }
+        .table td.correct {
+            background: #7fd1b9;
+        }
+        .table td.wrong {
+            background: #fa4779;
+        }
+        @media print {
+            .theme-toggle, .next { display: none; }
+            body { background: #fff; }
+        }
+        .quizly-logo{
+  position: fixed;
+  top: 16px;
+  right: 18px;
+  z-index: 999;
+}
 
-<style>
-:root{
-  --bg:#f8fafc;
-  --card:#ffffff;
-  --text:#020617;
-  --muted:#64748b;
-  --primary:#fa4779;
-  --success:#7cd3b5;
-  --danger:#f66d94;
-  --option:#e5e7eb;
+.quizly-logo img{
+  width: 74px; /* اندازه منطقی، نه ریز نه گنده */
+  cursor: pointer;
+  animation: quizlyFloat 4s ease-in-out infinite;
+  filter: drop-shadow(0 10px 28px rgba(250,71,121,.55));
+  transition: transform .35s ease, filter .35s ease;
 }
-body.dark{
-  --bg:#020617;
-  --card:#0f172a;
-  --text:#e5e7eb;
-  --muted:#94a3b8;
-  --option:#1e293b;
+
+.quizly-logo img:hover{
+  transform: scale(1.12) rotate(3deg);
+  filter: drop-shadow(0 16px 40px rgba(250,71,121,.85));
 }
-*{box-sizing:border-box}
-body{
-  margin:0;
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-family:Vazirmatn,Tahoma;
-  background:var(--bg);
-  color:var(--text);
+
+@keyframes quizlyFloat{
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
 }
-.card{
-  width:94%;
-  max-width:560px;
-  background:var(--card);
-  border-radius:20px;
-  padding:28px;
-  box-shadow:0 12px 40px rgba(0,0,0,.18);
-}
-.progress{
-  height:12px;
-  background:var(--option);
-  border-radius:999px;
-  overflow:hidden;
-  margin-bottom:16px;
-}
-.progress-bar{
-  height:100%;
-  width:0%;
-  background:linear-gradient(90deg,#fa4779,#ff80b3);
-  transition:.35s ease;
-}
-#counter{
-  font-size:14px;
-  color:var(--muted);
-  margin-bottom:14px;
-}
-.question{
-  font-size:21px;
-  font-weight:500;
-  margin-bottom:20px;
-}
-.options button{
-  width:100%;
-  margin:8px 0;
-  padding:14px;
-  border:none;
-  border-radius:14px;
-  background:var(--option);
-  color:var(--text);
-  cursor:pointer;
-  font-size:15px;
-  transition:.25s;
-}
-.options button:hover{transform:scale(1.01)}
-.correct{background:var(--success)!important;color:#fff}
-.incorrect{background:var(--danger)!important;color:#fff}
-.footer{
-  display:flex;
-  justify-content:space-between;
-  margin-top:22px;
-}
-.btn{
-  background:var(--primary);
-  color:#fff;
-  border:none;
-  border-radius:14px;
-  padding:10px 20px;
-  font-size:14px;
-  cursor:pointer;
-}
-#result{
-  margin-top:24px;
-  font-size:22px;
-  font-weight:600;
-  text-align:center;
-  line-height:1.8;
-}
-.grade{
-  font-size:40px;
-  font-weight:800;
-}
-.pass{color:var(--success)}
-.fail{color:var(--danger)}
-</style>
+
+    </style>
 </head>
-
 <body>
-<div class="card">
-  <div class="progress"><div class="progress-bar" id="progress"></div></div>
-  <div id="counter"></div>
-  <div id="quiz"></div>
-  <div class="footer">
-    <button class="btn" onclick="toggleMode()">🌗 حالت</button>
-    <button class="btn" id="nextBtn" onclick="next()">بعدی</button>
-  </div>
-  <div id="result"></div>
+<div class="quizly-logo">
+  <img src="https://uploadkon.ir/uploads/7e2d29_25Quizly.png" alt="Quizly Logo">
+</div>
+
+<button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+
+<div class="wrapper">
+    <div class="card">
+        <div class="progress-wrap">
+            <div class="progress" id="progress"></div>
+        </div>
+        <div id="quiz"></div>
+        <button class="next" id="nextBtn" onclick="next()">بعدی</button>
+        <div class="result" id="result"></div>
+    </div>
+    <div class="sheet">
+        <div class="sheet-grid" id="sheet"></div>
+    </div>
 </div>
 
 <script>
-const questions=[
-  {q:"کدام یک از کارکردهای خانواده سبب می‌شود فرد پایه عزت‌نفس سالم و احساس امنیت پیدا کند؟",options:["هویت شخصی","مرز با دیگران","ارضای نیازهای عاطفی","ارتباط با دیگران و محیط"],answer:2},
-  {q:"در کدام روند طلاق بخشش خود و دیگری دیده می‌شود؟",options:["طلاق تدارکاتی","طلاق روانی","طلاق والدینی","طلاق اجتماعی"],answer:1},
-  {q:"فاصله سنی مناسب بین زوجین حداکثر چند سال ذکر شده است؟",options:["7 یا 8 سال","10 تا 12 سال","4 یا 5 سال","1 تا 2 سال"],answer:0},
-  {q:"کدام یک از عوامل درونی طلاق است؟",options:["مشکلات همسر","تأثیر خانواده","فقدان مهارت‌های زندگی","تأثیر همسالان"],answer:2},
-  {q:"برای مقابله با انکار از کدام فن استفاده می‌شود؟",options:["صندلی خالی","همدلی","نگارش نامه مجازی","عادی‌سازی"],answer:3},
-  {q:"در درمان کدام هیجان پس از طلاق از فن سود و زیان استفاده می‌شود؟",options:["چانه‌زنی","خشم","احساس گناه","انکار"],answer:2},
-  {q:"کودکان چه سنی خود را مسئول تعارض والدین می‌دانند و احساس گناه می‌کنند؟",options:["کودکان خردسال","کودکان پیش‌دبستانی","کودکان دبستانی","نوجوانان"],answer:1},
-  {q:"فقدان پدر در دختران سبب چه مشکلی می‌شود؟",options:["وسواس","رفتار ضد اجتماعی","تخریبگری","پرخاشگری"],answer:1},
-  {q:"برخورداری از وکیل، کار و مسکن چه نام دارد؟",options:["حمایت خانوادگی","حمایت شخصی","حمایت اجتماعی","حمایت عاطفی"],answer:2},
-  {q:"مشاوره طلاق معمولاً چند جلسه طول می‌کشد؟",options:["10 تا 12 جلسه","5 تا 10 جلسه","6 تا 14 جلسه","15 تا 20 جلسه"],answer:2},
-  {q:"درمانگر برای کنترل تکانه جنسی و پرخاشگری والد از چه فنی استفاده می‌کند؟",options:["تکلیف رفتاری","بدترین پیامد","معیار دوگانه","سود و زیان"],answer:3},
-  {q:"زنان مطلقه افسرده ممکن است به کدام مورد روی بیاورند؟",options:["پرخوری","مصرف سیگار","اقدام به خودکشی","اعتیاد به مواد مخدر"],answer:0},
-  {q:"زوج‌هایی که پس از جدایی تعامل بیشتری دارند چه ویژگی دارند؟",options:["مشکلات جسمانی کمتر و روانشناختی بیشتر","مشکلات سازگاری کمتر و روانشناختی بیشتر","مشکلات جسمانی بیشتر و روانشناختی کمتر","مشکلات روانشناختی کمتر و سازگاری بیشتر"],answer:3},
-  {q:"آموزش مهارت‌ها و فنون معمولاً از جلسه چندم آغاز می‌شود؟",options:["جلسه سوم","جلسه پنجم","جلسه دوم","جلسه ششم"],answer:0},
-  {q:"برای تخلیه هیجانی زوج‌های خشمگین از چه فنی استفاده می‌شود؟",options:["صندلی خالی","قاب‌گیری","آشکارسازی","انتظار علامت"],answer:0},
-  {q:"با کدام فن درمانگر بیمار را با انگیزه‌های زیرین رفتار آشنا می‌سازد؟",options:["فن اختصاصی کردن","فن انتظار علامت","فن وارسی","فن تفسیر"],answer:2},
-  {q:"وقتی مشاور درباره مصرف مواد همسر سؤال می‌کند از کدام گذار استفاده کرده است؟",options:["ناگهانی","ارجاعی","ملایم","عمیق"],answer:1},
-  {q:"برای برنامه‌ریزی فعالیت‌های لذت‌بخش کدام شاخص مهم است؟",options:["علاقه","امکانات","لذت","زمان"],answer:3},
-  {q:"وقتی مراجع می‌گوید اوضاع بدتر خواهد شد، از چه تحریف شناختی استفاده کرده است؟",options:["فاجعه‌سازی","ذهن‌خوانی","برچسب‌زنی","پیش‌گویی"],answer:3},
-  {q:"فردی که برای پولدار شدن دزدی کرده کدام نشانه بلوغ روانی را ندارد؟",options:["توانایی حل مسئله","ارضای خواسته به شیوه مناسب","انتخاب اهداف و راهبردهای مناسب","هماهنگی توانایی‌ها با سن"],answer:2},
-  {q:"وقتی درمانگر با سؤال «گیرم این فکر درست باشد، چه معنایی دارد؟» پیش می‌رود از چه فنی استفاده کرده است؟",options:["تکالیف رفتاری","تحلیل سود و زیان","ثبت شواهد خلاف","پیکان رو به پایین"],answer:3},
-  {q:"آخرین مرحله کنار آمدن با طلاق چیست و چه مدت طول می‌کشد؟",options:["پذیرش، شش ماه تا دو سال","احساس گناه، سه ماه تا یک سال","پذیرش، سه ماه تا یک سال","احساس گناه، شش ماه تا دو سال"],answer:0},
-  {q:"خط اول درمان افسردگی شدید پس از طلاق چیست؟",options:["تخلیه هیجانی","دارودرمانی","فعالیت‌های لذت‌بخش","تاکید بر گذرا بودن افسردگی"],answer:1},
-  {q:"اولین مرحله در فرایند بخشش چیست؟",options:["اقدام به بخشش","کشف معنای رنج","آگاهی از رنجش و خشم","تصمیم‌گیری برای بخشش"],answer:2},
-  {q:"دستیابی به کدام اهداف از چند هفته تا چند ماه امکان‌پذیر است؟",options:["اهداف میان‌مدت","اهداف کوتاه‌مدت","اهداف آنی","اهداف درازمدت"],answer:1},
-  {q:"با کدام مهارت آگاهی از جنبه‌های جسمانی و روانی خود حاصل می‌شود؟",options:["آگاهی از ویژگی‌های روانی","آگاهی از افکار","آگاهی از نقاط ضعف و قوت","آگاهی از خود"],answer:3},
-  {q:"به کمک کدام فن فرد دیدگاه خود را نسبت به رویداد تغییر می‌دهد؟",options:["تصویرسازی ذهنی","ایجاد فاصله","معنایابی","توجه‌گردانی"],answer:2},
-  {q:"مهم‌ترین عامل پیش‌بینی‌کننده سازگاری فرزندان در بزرگسالی چیست؟",options:["سازگاری روانی کودکان","ملاقات‌های منظم","ارتباط با هر دو والد","صمیمیت"],answer:3}
+const questions = [
+  {q:"چند درصد از نتایج مثبت به دست آمده در روان درمانی و مشاوره به عواملی که در اختیار مشاور و روان درمانگر نمی‌باشند بستگی دارد؟",options:["20 درصد","30 درصد","40 درصد","30 درصد"],answer:0},
+  {q:"کسب تجارب گذشته و استفاده از آنها برای برنامه‌ریزی حال و آینده، جزء ویژگی‌های کدام حیطه مشاوران و روان درمانگران می‌باشد؟",options:["اخلاقی","شناختی","عاطفی","ارتباطی"],answer:1},
+  {q:"پایه و اساس کاربرد علمی روان درمانی و مشاوره مبتنی بر کدامیک از عوامل زیر می‌باشد؟",options:["مهارت مشاور","متدولوژی","نظریه","شخصیت مشاور"],answer:2},
+  {q:"امروزه متخصصان علوم رفتاری بیشتر به موثر بودن کدام رویکرد اعتقاد دارند؟",options:["رویکرد رفتاری","رویکرد شناختی","رویکرد التقاطی","رویکرد مراجع‌محوری"],answer:2},
+  {q:"از نظر فروید هدف اصلی و نهایی همه رفتارهای بشر چیست؟",options:["رسیدن به خود شکوفایی","کاهش تنش","تخلیه انرژی‌های مازاد","رسیدن به تعادل"],answer:1},
+  {q:"از نظر فروید کدام بخش شخصیت انسان تابع اصل واقعیت است؟",options:["بن","نهاد","من","فرا من"],answer:2},
+  {q:"در کدام مکانیزم دفاعی تکانه‌ها و انگیزه‌های ناپسند اجتماعی، به صورت رفتارهای مورد قبول جامعه تجلی می‌یابد؟",options:["واکنش‌سازی","تصعید","فرافکنی","والایش"],answer:1},
+  {q:"عقده ادیپ و عقده الکترا در پسران و دختران در کدام مرحله رشدی از بین می‌روند؟",options:["مقعدی","نهفتگی","تناسلی","دهانی"],answer:1},
+  {q:"زمانی که بین خود به صورتی که درک می‌شود و تجربه واقعی ارگانیزم اختلاف باشد، کدام حالت ایجاد می‌شود؟",options:["ناهمخوانی","تعارض","خودپنداره کاذب","احساس شکست"],answer:0},
+  {q:"از نظر راجرز حالت دفاعی در برابر اضطراب و تهدید از طریق چه مکانیزم‌هایی صورت می‌گیرد؟",options:["فرافکنی و تصعید","همانندسازی و سرکوب","تحریف و انکار","بازگشت و والایش"],answer:2},
+  {q:"اهمیت دادن به دیگران و لذت بردن از همنشینی با آنها به کدامیک از مفاهیم زیر دلالت دارد؟",options:["پذیرش میان فردی","تایید توانایی دیگران","همدردی","صمیمیت"],answer:3},
+  {q:"اولین شرط لازم و کافی برای درمان کدام است؟",options:["توجه مثبت نامشروط","همخوانی","تغییر در روش و توسعه انتقال","رهایی از چهارچوب‌های شناختی قبلی"],answer:1},
+  {q:"سومین مرحله درمان راجرزی کدام است؟",options:["تغییر از همخوانی","تغییر در روش تجربه کردن","تغییر در روش و توسعه انتقال","رهایی از چهارچوب‌های شناختی قبلی"],answer:0},
+  {q:"نگاه ویکتور فرانکل به انسان چگونه است؟",options:["انسان ذاتاً شرور است","انسان ذاتاً مسئول است","انسان تحت جبر محیط است","انسان وحشی رام شده است"],answer:1},
+  {q:"کدام جنبه از تحقق معنا، به فرد در مواجهه با شرایط نومیدکننده مثل سرطان کمک می‌کند؟",options:["جنبه‌های خلاق","جنبه‌های تجربی","جنبه‌های نگرشی","جنبه‌های شخصی"],answer:2},
+  {q:"مرگ از دیدگاه فرانکل چگونه توصیف شده است؟",options:["پایان زندگی است","به زندگی جهت می‌دهد","پایان اتمام انرژی جسمانی است","نشانه ضعف انسان است"],answer:1},
+  {q:"در نظر پرلز اگر فردی انرژی خود را جهت راضی کردن جهان بیرونی صرف نماید، دچار چه نوع بیماری می‌شود؟",options:["اضطراب","روان‌آزردگی","افسردگی","وسواس"],answer:1},
+  {q:"در کدام لایه روان‌آزردگی، تماس غیرخالصانه و مزورانه به دیگران وجود دارد؟",options:["درون‌پاشی","برون‌پاشی","وانمودسازی","بن‌بست"],answer:2},
+  {q:"پختگی و کمال یافتن فرد هدف درمانی کدام رویکرد است؟",options:["رویکرد مراجع‌محوری","رویکرد معنا درمانی","رویکرد گشتالت درمانی","رویکرد شناختی"],answer:2},
+  {q:"برای درمان کدامیک از موارد زیر استفاده از رفتار درمانی موثر نمی‌باشد؟",options:["اضطراب","افسردگی","اختلال خوردن","روان‌آزردگی"],answer:1},
+  {q:"درمان عقلانی-عاطفی توسط چه کسی پایه‌گذاری شده است؟",options:["آرون بک","مارتین سلیگمن","مایکل بام","آلبرت آلیس"],answer:3},
+  {q:"«هیچ چیز خوب و بدی وجود ندارد، نوع تفکری که انسان‌ها اختیار می‌کنند، خوب و بد را می‌سازد» بیشتر به پایه فلسفی کدام رویکرد مشاوره و روان‌درمانی نزدیک است؟",options:["رویکرد گشتالت","رویکرد شناختی","رویکرد معنا درمانی","رویکرد مراجع‌محوری"],answer:1},
+  {q:"مفروضه اساسی روش درمانی مایکل بام چیست؟",options:["ارزیابی افراد از خودشان","باورهای غیرمنطقی","نگرش‌های بدبینانه","مطلق‌نگری و جزمی‌نگری"],answer:1},
+  {q:"کدام گزینه بیانگر اجزاء مثلث شناختی آرون بک است؟",options:["رویدادهای بد-محیط-گذشته","دیگران-دنیا-گذشته","خود-دنیا-آینده","گذشته-حال-آینده"],answer:2},
+  {q:"روش درمان شناختی بک نخست برای درمان کدامیک از موارد زیر ابداع شده است؟",options:["نشانگان روان‌پریشی","افسردگی","اختلالات اضطرابی","اعتیاد"],answer:1},
+  {q:"تاکید بیش از حد بر روی جزء منفی یک موقعیت و نادیده گرفتن جنبه‌های مثبت آن موقعیت، بیانگر کدام خطای شناختی است؟",options:["استنباط دلخواهی","تعمیم بیش از حد","بزرگ‌نمایی و کوچک‌نمایی","انتزاع انتخابی"],answer:3},
+  {q:"مرحله اول شیوه خودآموزی مایکل بام کدام است؟",options:["کسب مهارت","درک و فهم","ارائه راه‌حل","اجرا و ارزیابی"],answer:1},
+  {q:"از نظر پرلز کدام مورد برای کودک در حال تحول مطلوب است؟",options:["تماس","بالا بردن آگاهی","ناکامی","وانمودسازی"],answer:1},
+  {q:"کدام لایه برای زندگی حقیقی و خلوص ضروری است؟",options:["درون‌پاشی","برون‌پاشی","هراس","بن‌بست"],answer:1},
+  {q:"در کدام مورد خوداعتلایی مورد توجه است؟",options:["تعدیل نگرشی","قصد متناقض","بازتاب‌زدایی","تعلیم حساسیت به معنا"],answer:2}
 ];
 
+    let index = 0;
+    let correctCount = 0;
+    const userAnswers = Array(questions.length).fill(null);
 
-const state={index:0,score:0};
-const quiz=document.getElementById("quiz");
-const counter=document.getElementById("counter");
-const progress=document.getElementById("progress");
-const result=document.getElementById("result");
-const nextBtn=document.getElementById("nextBtn");
+    const quiz = document.getElementById("quiz");
+    const sheet = document.getElementById("sheet");
+    const nextBtn = document.getElementById("nextBtn");
+    const progress = document.getElementById("progress");
 
-function render(){
-  const q=questions[state.index];
-  quiz.innerHTML=`
-    <div class="question">${q.q}</div>
-    <div class="options">
-      ${q.options.map((o,i)=>`<button onclick="answer(${i})">${o}</button>`).join("")}
-    </div>
-  `;
-  counter.textContent=`سؤال ${state.index+1} از ${questions.length}`;
-  progress.style.width=(state.index/questions.length*100)+"%";
-  nextBtn.style.display="none";
-}
+    function render() {
+        const q = questions[index];
+        quiz.innerHTML = `
+            <div class="question">${q.q}</div>
+            <div class="options">
+                ${q.options.map((o, i) => `<div class="option" onclick="select(${i})">${o}</div>`).join("")}
+            </div>`;
+        nextBtn.style.display = "none";
+        updateProgress();
+        renderSheet();
+    }
 
-function answer(i){
-  const q=questions[state.index];
-  const buttons=document.querySelectorAll(".options button");
-  buttons.forEach(b=>b.disabled=true);
-  if(i===q.answer){
-    buttons[i].classList.add("correct");
-    state.score++;
-  }else{
-    buttons[i].classList.add("incorrect");
-    buttons[q.answer].classList.add("correct");
-  }
-  nextBtn.style.display="inline-block";
-}
+    function updateProgress() {
+        progress.style.width = `${(index / questions.length) * 100}%`;
+    }
 
-function next(){
-  state.index++;
-  state.index<questions.length ? render() : finish();
-}
+    function renderSheet() {
+        sheet.innerHTML = questions.map((q, i) => {
+            const ua = userAnswers[i];
+            return `
+                <div class="sheet-cell ${i === index ? "active" : ""}">
+                    <b>${i + 1}</b>
+                    <div class="answers">
+                        ${["الف", "ب", "ج", "د"].map((l, j) => {
+                            let c = "";
+                            if (ua !== null) {
+                                c = j === q.answer ? "correct" : (j === ua ? "wrong" : "");
+                            }
+                            return `<div class="bubble ${c}">${l}</div>`;
+                        }).join("")}
+                    </div>
+                </div>`;
+        }).join("");
+    }
 
-function finish(){
-  quiz.innerHTML="";
-  counter.textContent="";
-  progress.style.width="100%";
+    function select(i) {
+        if (userAnswers[index] !== null) return;
+        userAnswers[index] = i;
+        if (i === questions[index].answer) correctCount++;
+        nextBtn.style.display = "block";
+        renderSheet();
+    }
 
-  const percent=Math.round(state.score/questions.length*100);
-  const grade=(state.score/questions.length*20).toFixed(1);
-  const status=grade>=10?"pass":"fail";
-  const label=grade>=17?"عالی":grade>=14?"خیلی خوب":grade>=10?"قبول":"مردود";
+    function next() {
+        index++;
+        if (index < questions.length) {
+            render();
+        } else {
+            finish();
+        }
+    }
 
-  result.innerHTML=`
-    <div class="grade ${status}">${grade} / ۲۰</div>
-    <div>${label}</div>
-    <div>درصد پاسخ صحیح: ${percent}٪</div>
-  `;
-}
+    function finish() {
+        progress.style.width = "100%";
+        const totalQuestions = questions.length;
+        const grade = ((correctCount / totalQuestions) * 20).toFixed(2);
+        const percentage = ((correctCount / totalQuestions) * 100).toFixed(2);
+        const answeredQuestions = userAnswers.filter(answer => answer !== null).length;
+        let desc = "";
 
-function toggleMode(){
-  document.body.classList.toggle("dark");
-}
+        if (grade >= 18) desc = "عالی و مسلط";
+        else if (grade >= 15) desc = "خوب";
+        else if (grade >= 12) desc = "قابل قبول";
+        else desc = "نیازمند تمرین جدی";
 
-render();
+        quiz.innerHTML = `
+            <div class="score">${grade} / ۲۰</div>
+            <div class="desc">${desc}</div>
+            <div>شما ${answeredQuestions} از ${totalQuestions} سوال را پاسخ داده‌اید. (${percentage}%)</div>
+            <button class="print" onclick="openPrintWindow()">آماده‌سازی جهت چاپ</button>
+        `;
+    }
+
+    function openPrintWindow() {
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html lang="fa" dir="rtl">
+            <head>
+                <meta charset="UTF-8">
+                <title>نتیجه آزمون</title>
+                <style>
+                    body { font-family: 'Vazirmatn', Tahoma, sans-serif; direction: rtl; }
+                    .result { text-align: center; margin: 20px; }
+                    .table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    .table th, .table td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+                    .table th { background: var(--pink); color: #fff; }
+                    .table td.correct { background: #7fd1b9; }
+                    .table td.wrong { background: #fa4779; }
+                </style>
+            </head>
+            <body>
+                <div class="result">
+                    <h1>نتیجه آزمون</h1>
+                    <div class="score">${(correctCount / questions.length * 20).toFixed(2)} / ۲۰</div>
+                    <div>شما ${userAnswers.filter(answer => answer !== null).length} از ${questions.length} سوال را پاسخ داده‌اید.</div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>سوال</th>
+                                <th>پاسخ شما</th>
+                                <th>پاسخ صحیح</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${questions.map((q, i) => `
+                                <tr>
+                                    <td>${q.q}</td>
+                                    <td class="${userAnswers[i] === q.answer ? 'correct' : 'wrong'}">${["الف", "ب", "ج", "د"][userAnswers[i]] || 'پاسخ داده نشده'}</td>
+                                    <td>${["الف", "ب", "ج", "د"][q.answer]}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle("dark");
+    }
+
+    render();
 </script>
+
 </body>
 </html>
