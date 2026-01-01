@@ -1,191 +1,519 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<title>Quizly | آزمون‌های درمانی</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700&display=swap" rel="stylesheet">
-
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Quizly — Therapy (پیشرفته)</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
+:root{
+  --brand:#fb5180;
+  --brand-2:#ff7fa0;
+  --bg:#fff6f8;
+  --card:#ffffff;
+  --muted:#6b6b6b;
+  --glass: rgba(255,255,255,0.6);
+  --radius:16px;
+  --maxw:980px;
+  --shadow-1: 0 10px 30px rgba(15,15,15,0.06);
+  --accent: 0 14px 40px rgba(251,81,128,0.14);
+  --ease: cubic-bezier(.2,.9,.2,1);
+  --text: #111;
+  --muted-2: #8a8a8a;
+}
 
-body {
-  font-family: 'Vazirmatn', sans-serif;
-  min-height: 100vh;
+/* Dark theme variables (applied when html.dark exists) */
+html.dark {
+  --bg: #0f1114;
+  --card: #0f1116;
+  --text: #e9e9ea;
+  --muted: #bdbdbd;
+  --muted-2: #9ea0a3;
+  --shadow-1: 0 10px 30px rgba(0,0,0,0.6);
+  --accent: 0 14px 40px rgba(251,81,128,0.12);
+}
+
+/* Reset */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
+  font-family:"Vazirmatn",system-ui,-apple-system,"Segoe UI",Roboto,Arial;
   background:
-    radial-gradient(circle at top right, rgba(250,71,121,0.25), transparent 45%),
-    radial-gradient(circle at bottom left, rgba(250,71,121,0.18), transparent 45%),
-    linear-gradient(135deg, #fff1f5, #ffe4ec);
-  color: #3a0f1f;
+    radial-gradient(900px 420px at 8% 12%, rgba(251,81,128,0.06), transparent 6%),
+    radial-gradient(700px 360px at 92% 88%, rgba(255,127,160,0.04), transparent 8%),
+    var(--bg);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:18px;
+  padding:22px 14px;
+  transition: background .35s var(--ease), color .35s var(--ease);
 }
 
-/* ---------- Header ---------- */
-header {
-  text-align: center;
-  padding: 40px 20px 20px;
-  background: linear-gradient(135deg, #fff1f5, #ffe4ec);
-  position: relative;
+/* Sticky header with glass effect */
+.header {
+  position: sticky;
+  top:14px;
+  width:100%;
+  max-width:var(--maxw);
+  display:flex;
+  align-items:center;
+  gap:18px;
+  padding:14px;
+  border-radius:20px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0.45));
+  box-shadow: var(--shadow-1);
+  backdrop-filter: blur(8px) saturate(120%);
+  z-index:60;
+}
+html.dark .header{
+  background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
 }
 
-.logo-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
+/* Logo block with layered shine */
+.logo-wrap{
+  width:104px;
+  height:104px;
+  border-radius:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:visible;
+  background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+  box-shadow: 0 12px 36px rgba(251,81,128,0.08), inset 0 -6px 18px rgba(0,0,0,0.04);
+  transition: transform .6s var(--ease), box-shadow .45s;
 }
-
+html.dark .logo-wrap{ box-shadow: 0 12px 36px rgba(0,0,0,0.45) }
+.logo-wrap:hover{ transform: translateY(-8px) rotate(-3deg) scale(1.04); box-shadow: var(--accent) }
 .logo {
-  width: 160px;
-  height: auto;
-  border-radius: 24px;
-  box-shadow: 0 10px 35px rgba(250, 71, 121, 0.5), 0 0 12px rgba(250, 71, 121, 0.35) inset;
-  animation: logoPulse 3s ease-in-out infinite;
-  transition: transform 0.35s ease, box-shadow 0.35s ease;
+  width:76px;
+  height:auto;
+  border-radius:10px;
+  display:block;
+  transform-origin:center;
+  transition: transform .6s var(--ease), filter .4s;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+}
+.logo-overlay{
+  position:absolute;
+  inset:0;
+  border-radius:14px;
+  pointer-events:none;
+  background:
+    radial-gradient(60% 40% at 20% 20%, rgba(255,255,255,0.18), transparent 10%),
+    linear-gradient(120deg, rgba(251,81,128,0.08), rgba(255,127,160,0.03));
+  mix-blend-mode: screen;
+  filter: blur(10px);
+  opacity:0.95;
+  transition: transform .6s, opacity .45s;
+}
+.logo-reflect{
+  position:absolute;
+  left:10px;
+  bottom:8px;
+  width:56%;
+  height:16%;
+  background:linear-gradient(180deg, rgba(255,255,255,0.45), rgba(255,255,255,0.02));
+  transform:skewX(-12deg);
+  border-radius:8px;
+  opacity:.6;
+  filter: blur(6px);
+  pointer-events:none;
 }
 
-.logo:hover {
-  transform: scale(1.15) rotate(-3deg);
-  box-shadow: 0 20px 55px rgba(250, 71, 121, 0.7), 0 0 22px rgba(250, 71, 121, 0.45) inset;
+/* Header text */
+.header-title h1{ font-size:1.45rem; color:var(--text); font-weight:800 }
+.header-title p{ margin-top:6px; color:var(--muted); font-size:0.92rem }
+
+/* Controls */
+.controls{
+  width:100%;
+  max-width:var(--maxw);
+  display:flex;
+  gap:12px;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:8px;
+}
+.search{
+  flex:1;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.95));
+  padding:10px;
+  border-radius:12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+  border:1px solid rgba(0,0,0,0.03);
+}
+html.dark .search{ background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03) }
+.search input{
+  border:0; outline:none; background:transparent; font-size:0.98rem; width:100%; color:var(--text);
+}
+.icon{ width:20px; height:20px; opacity:.75 }
+
+/* Buttons */
+.btn{ border:0; cursor:pointer; padding:10px 12px; border-radius:12px; font-weight:700; font-size:0.95rem }
+.primary{ background: linear-gradient(90deg,var(--brand),var(--brand-2)); color:#fff; box-shadow: 0 12px 36px rgba(251,81,128,0.14) }
+.ghost{ background:transparent; border:1px solid rgba(0,0,0,0.06); color:var(--text) }
+html.dark .ghost{ border:1px solid rgba(255,255,255,0.06) }
+
+/* Panel */
+.panel{
+  width:100%;
+  max-width:var(--maxw);
+  background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.98));
+  border-radius:18px;
+  padding:18px;
+  box-shadow: 0 18px 40px rgba(12,12,12,0.06);
+  max-height:72vh;
+  overflow:auto;
+  -webkit-overflow-scrolling:touch;
+  transition: background .35s var(--ease), box-shadow .35s;
+}
+html.dark .panel{ background: linear-gradient(180deg, rgba(18,18,22,0.6), rgba(12,12,16,0.6)); box-shadow: 0 18px 40px rgba(0,0,0,0.6) }
+
+/* Scrollbar */
+.panel::-webkit-scrollbar{ width:12px }
+.panel::-webkit-scrollbar-track{ background:transparent; margin:12px; border-radius:10px }
+.panel::-webkit-scrollbar-thumb{
+  background: linear-gradient(180deg,var(--brand),var(--brand-2));
+  border-radius:10px;
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,0.12);
 }
 
-@keyframes logoPulse {
-  0%, 100% { transform: scale(1) rotate(0deg); }
-  50% { transform: scale(1.05) rotate(2deg); }
-}
+/* Grid */
+.quiz-list{ display:grid; grid-template-columns:1fr; gap:14px; padding-bottom:8px }
 
-header h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #fa4779, #ff7aa2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Card */
+.quiz-card{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:16px; border-radius:14px;
+  background: linear-gradient(180deg, var(--card), rgba(255,255,255,0.98));
+  border:1px solid rgba(251,81,128,0.04);
+  box-shadow: 0 8px 24px rgba(20,20,20,0.04);
+  transform: translateY(12px); opacity:0;
+  transition: transform .5s var(--ease), box-shadow .22s, opacity .45s;
 }
+html.dark .quiz-card{ background: linear-gradient(180deg, rgba(18,18,22,0.6), rgba(12,12,16,0.6)); border:1px solid rgba(255,255,255,0.03) }
+.quiz-card.visible{ transform: translateY(0); opacity:1 }
+.quiz-card:hover{ transform: translateY(-8px) scale(1.01); box-shadow: 0 26px 60px rgba(20,20,20,0.09) }
 
-header p {
-  margin-top: 6px;
-  font-size: 0.95rem;
-  color: #7a2a43;
+.quiz-left{ display:flex; align-items:center; gap:12px }
+.badge{
+  min-width:64px; height:64px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+  color:#fff; font-weight:800; background: linear-gradient(135deg,var(--brand),var(--brand-2));
+  box-shadow: 0 12px 36px rgba(251,81,128,0.12); font-size:0.98rem;
 }
+.quiz-info h3{ font-size:1.02rem; color:var(--text); font-weight:800 }
+.quiz-info p{ font-size:0.86rem; color:var(--muted); margin-top:6px; max-width:56ch; white-space:nowrap; overflow:hidden; text-overflow:ellipsis }
 
-/* ---------- Wrapper ---------- */
-.quiz-wrapper {
-  max-width: 760px;
-  margin: 0 auto;
-  padding: 0 20px 40px;
-}
+/* Actions */
+.actions{ display:flex; gap:10px; align-items:center }
+.start{ padding:10px 14px; border-radius:12px; color:#fff; background: linear-gradient(90deg,var(--brand),var(--brand-2)); text-decoration:none; font-weight:800; box-shadow: 0 12px 36px rgba(251,81,128,0.14) }
+.info{ padding:8px 10px; border-radius:10px; background:transparent; border:1px solid rgba(0,0,0,0.06); color:var(--text); font-weight:700 }
+html.dark .info{ border:1px solid rgba(255,255,255,0.06) }
 
-/* ---------- Scroll ---------- */
-.quiz-scroll {
-  max-height: 460px;
-  overflow-y: auto;
-  padding-right: 6px;
+/* Modal */
+.modal-backdrop{
+  position:fixed; inset:0; background:rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; z-index:120;
+  opacity:0; pointer-events:none; transition:opacity .22s;
 }
+.modal-backdrop.show{ opacity:1; pointer-events:auto }
+.modal{
+  width:calc(100% - 48px); max-width:720px; background:var(--card); border-radius:14px; padding:18px; box-shadow: 0 30px 80px rgba(0,0,0,0.35);
+  transform: translateY(18px); transition: transform .28s var(--ease);
+}
+.modal-backdrop.show .modal{ transform: translateY(0) }
 
-.quiz-scroll::-webkit-scrollbar {
-  width: 7px;
+/* To-top */
+.to-top{
+  position:fixed; right:20px; bottom:20px; z-index:100;
+  width:56px; height:56px; border-radius:14px; display:flex; align-items:center; justify-content:center;
+  background: linear-gradient(90deg,var(--brand),var(--brand-2)); color:#fff; box-shadow: 0 18px 40px rgba(251,81,128,0.16);
+  border:0; cursor:pointer; transform: translateY(20px); opacity:0; transition: transform .28s, opacity .28s;
 }
-.quiz-scroll::-webkit-scrollbar-thumb {
-  background: linear-gradient(#fa4779, #ff8fb1);
-  border-radius: 10px;
-}
+.to-top.show{ transform: translateY(0); opacity:1 }
 
-/* ---------- List ---------- */
-.quiz-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
+/* Empty */
+.empty{ text-align:center; padding:36px 12px; color:var(--muted) }
 
-/* ---------- Card ---------- */
-.quiz-card {
-  position: relative;
-  background: rgba(255,255,255,0.65);
-  backdrop-filter: blur(10px);
-  border-radius: 18px;
-  padding: 22px 26px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow:
-    0 12px 30px rgba(250,71,121,0.18),
-    inset 0 0 0 1px rgba(255,255,255,0.5);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  overflow: hidden;
-}
+/* Focus */
+a:focus, button:focus, input:focus{ outline:3px solid rgba(251,81,128,0.12); outline-offset:3px; border-radius:8px }
 
-/* نور ملایم */
-.quiz-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    120deg,
-    transparent 30%,
-    rgba(255,255,255,0.65),
-    transparent 70%
-  );
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.quiz-card:hover::before {
-  opacity: 1;
-}
-
-.quiz-card:hover {
-  transform: translateY(-6px) scale(1.01);
-  box-shadow: 0 22px 45px rgba(250,71,121,0.35);
-}
-
-.quiz-info h3 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #5c102b;
-}
-
-/* ---------- Button ---------- */
-.quiz-card a {
-  text-decoration: none;
-  padding: 10px 26px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #fa4779, #ff7aa2);
-  color: #fff;
-  font-weight: 600;
-  font-size: 0.9rem;
-  box-shadow: 0 6px 18px rgba(250,71,121,0.45);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s;
-}
-
-.quiz-card a:hover {
-  filter: brightness(1.06);
-}
-
-.quiz-card a:active {
-  transform: translateY(2px);
-  box-shadow: 0 3px 10px rgba(250,71,121,0.3);
+/* Responsive tweaks */
+@media (min-width:900px){
+  .quiz-list{ grid-template-columns:1fr }
+  .header-title h1{ font-size:1.6rem }
 }
 </style>
 </head>
-
 <body>
 
-<header>
-  <div class="logo-container">
-    <img src="https://uploadkon.ir/uploads/7e2d29_25Quizly.png" alt="Quizly Logo" class="logo">
-    <h1>آزمون های نظریه مشاوره و روان درمانی 1</h1>
-    <p>نگران چیزی نباش با این سوالا 80 درصد راه و رفتی</p>
+<!-- Header -->
+<header class="header" role="banner" aria-label="Quizly header">
+  <div class="logo-wrap" aria-hidden="false">
+    <img class="logo" id="logoImg" src="https://uploadkon.ir/uploads/7e2d29_25Quizly.png" alt="Quizly Logo" loading="lazy">
+    <div class="logo-overlay" aria-hidden="true"></div>
+    <div class="logo-reflect" aria-hidden="true"></div>
+  </div>
+
+  <div class="header-title" aria-hidden="false">
+    <h1>Quizly — مرکز کوییز و امتحان</h1>
+    <h6>سولات نظریه مشاوره و رواندرمانی 1</h6>
+    <p>۲۰ کوییز مرتب، قابل جستجو، با تجربهٔ کاربری حرفه‌ای</p>
+  </div>
+
+  <div style="margin-inline-start:auto; display:flex; gap:8px; align-items:center">
+    <button id="themeToggle" class="btn ghost" aria-pressed="false" title="تغییر تم">حالت تاریک</button>
   </div>
 </header>
 
-<main class="quiz-wrapper">
-  <div class="quiz-scroll">
-    <div class="quiz-list">
-
-      <div class="quiz-card"><div class="quiz-info"><h3>Quiz 1</h3></div><a href="quiz1.html">شروع آزمون</a></div>
-
-    </div>
+<!-- Controls -->
+<div class="controls" role="region" aria-label="جستجو و فیلتر">
+  <div class="search" role="search" aria-label="جستجوی کوییز">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 21l-4.35-4.35" stroke="#333" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="11" cy="11" r="6" stroke="#333" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <input id="search" type="search" placeholder="جستجوی کوییز یا شماره (کلید / برای فوکوس)" aria-label="جستجوی کوییز">
   </div>
+
+  <div style="display:flex; gap:8px">
+    <button id="reset" class="btn ghost" title="نمایش همه">نمایش همه</button>
+    <button id="sort" class="btn ghost" title="مرتب‌سازی">مرتب‌سازی</button>
+    <button id="shuffle" class="btn primary" title="ترتیب تصادفی">ترتیب تصادفی</button>
+  </div>
+</div>
+
+<!-- Panel -->
+<main class="panel" id="panel" role="main" aria-live="polite">
+  <div id="list" class="quiz-list" role="list" aria-label="فهرست کوییزها"></div>
+  <div id="empty" class="empty" hidden>نتیجه‌ای یافت نشد.</div>
 </main>
 
+<!-- Modal (جزئیات) -->
+<div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal" role="document" aria-labelledby="modalTitle">
+    <header style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+      <div>
+        <h2 id="modalTitle" style="font-size:1.15rem;margin-bottom:6px">جزئیات کوییز</h2>
+        <p id="modalSubtitle" style="color:var(--muted);font-size:0.92rem;margin:0">خلاصه و اطلاعات تکمیلی</p>
+      </div>
+      <div>
+        <button id="modalClose" class="btn ghost" aria-label="بستن">بستن</button>
+      </div>
+    </header>
+    <hr style="margin:12px 0;border:none;border-top:1px solid rgba(0,0,0,0.06)">
+    <section id="modalBody" style="font-size:0.95rem;color:var(--text);line-height:1.6">
+      <!-- محتوا با JS پر می‌شود -->
+    </section>
+    <footer style="display:flex;justify-content:flex-end;margin-top:16px;gap:8px">
+      <a id="modalStart" class="start" href="#" role="button">شروع آزمون</a>
+    </footer>
+  </div>
+</div>
+
+<!-- To top -->
+<button id="toTop" class="to-top" aria-label="بازگشت به بالا" title="بازگشت به بالا">▲</button>
+
+<!-- Footer -->
+<footer style="width:100%; max-width:var(--maxw); text-align:center; color:var(--muted); padding:12px 0 40px;">
+  با 💗 Quizly
+</footer>
+
+<script>
+/* دادهٔ نمونه */
+const quizzes = Array.from({length:20}, (_,i)=>({
+  id: i+1,
+  title: `Quiz ${i+1}`,
+  desc: `آزمون شماره ${i+1} — مجموعه‌ای از سوالات چهارگزینه‌ای برای تمرین و ارزیابی`,
+  details: `این آزمون شامل 20 سوال چهارگزینه‌ای است. زمان پیشنهادی: 15 دقیقه. مناسب برای مرور سریع و سنجش دانش.`,
+  href: `quiz${i+1}.html`,
+  tags: i%2===0 ? ['روانشناسی','تمرین'] : ['آزمون','سریع']
+}));
+
+/* المان‌ها */
+const listEl = document.getElementById('list');
+const emptyEl = document.getElementById('empty');
+const searchInput = document.getElementById('search');
+const resetBtn = document.getElementById('reset');
+const shuffleBtn = document.getElementById('shuffle');
+const sortBtn = document.getElementById('sort');
+const panel = document.getElementById('panel');
+const toTopBtn = document.getElementById('toTop');
+const modalBackdrop = document.getElementById('modalBackdrop');
+const modalBody = document.getElementById('modalBody');
+const modalTitle = document.getElementById('modalTitle');
+const modalSubtitle = document.getElementById('modalSubtitle');
+const modalClose = document.getElementById('modalClose');
+const modalStart = document.getElementById('modalStart');
+const themeToggle = document.getElementById('themeToggle');
+
+let current = [...quizzes];
+let sortAsc = true;
+
+/* امن‌سازی متن */
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+/* ساخت کارت */
+function makeCard(q, idx){
+  const card = document.createElement('article');
+  card.className = 'quiz-card';
+  card.setAttribute('role','listitem');
+  card.innerHTML = `
+    <div class="quiz-left">
+      <div class="badge" aria-hidden="true">Q${q.id}</div>
+      <div class="quiz-info">
+        <h3>${escapeHtml(q.title)}</h3>
+        <p title="${escapeHtml(q.desc)}">${escapeHtml(q.desc)}</p>
+      </div>
+    </div>
+    <div class="actions">
+      <a class="start" href="${encodeURI(q.href)}" aria-label="شروع ${escapeHtml(q.title)}">شروع</a>
+      <button class="info" type="button" data-id="${q.id}" aria-label="جزئیات ${escapeHtml(q.title)}">جزئیات</button>
+    </div>
+  `;
+  // انیمیشن ورود با تاخیر
+  setTimeout(()=>card.classList.add('visible'), 30 * idx);
+  return card;
+}
+
+/* رندر */
+function render(list){
+  listEl.innerHTML = '';
+  if(!list.length){ emptyEl.hidden = false; return; }
+  emptyEl.hidden = true;
+  const frag = document.createDocumentFragment();
+  list.forEach((q, idx)=>frag.appendChild(makeCard(q, idx)));
+  listEl.appendChild(frag);
+}
+
+/* جستجو با debounce */
+function debounce(fn, wait=180){
+  let t;
+  return (...args)=>{ clearTimeout(t); t = setTimeout(()=>fn(...args), wait); };
+}
+function doSearch(q){
+  const term = q.trim().toLowerCase();
+  if(!term){ current = [...quizzes]; render(current); return; }
+  const filtered = quizzes.filter(it=>{
+    return it.title.toLowerCase().includes(term) || it.desc.toLowerCase().includes(term) || it.tags.join(' ').toLowerCase().includes(term) || String(it.id)===term;
+  });
+  current = filtered;
+  render(filtered);
+}
+const debounced = debounce(doSearch, 180);
+searchInput.addEventListener('input', e=>debounced(e.target.value));
+
+/* دکمه‌ها */
+resetBtn.addEventListener('click', ()=>{
+  searchInput.value = '';
+  current = [...quizzes];
+  render(current);
+  searchInput.focus();
+});
+shuffleBtn.addEventListener('click', ()=>{
+  current = shuffleArray(current.length ? current : quizzes);
+  render(current);
+});
+sortBtn.addEventListener('click', ()=>{
+  sortAsc = !sortAsc;
+  current.sort((a,b)=> sortAsc ? a.id - b.id : b.id - a.id);
+  render(current);
+});
+
+/* shuffle */
+function shuffleArray(arr){
+  const a = [...arr];
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+/* to-top visibility */
+panel.addEventListener('scroll', ()=>{
+  if(panel.scrollTop > 220) toTopBtn.classList.add('show'); else toTopBtn.classList.remove('show');
+});
+toTopBtn.addEventListener('click', ()=>{ panel.scrollTo({top:0, behavior:'smooth'}); });
+
+/* keyboard shortcut for search */
+document.addEventListener('keydown', (e)=>{
+  if(e.key === '/' && document.activeElement !== searchInput){
+    e.preventDefault();
+    searchInput.focus();
+  }
+});
+
+/* modal handling (delegation) */
+listEl.addEventListener('click', (e)=>{
+  if(e.target.matches('.info')){
+    const id = Number(e.target.dataset.id);
+    const q = quizzes.find(x=>x.id===id);
+    if(!q) return;
+    openModal(q);
+  }
+});
+modalClose.addEventListener('click', closeModal);
+modalBackdrop.addEventListener('click', (e)=>{ if(e.target===modalBackdrop) closeModal(); });
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeModal(); });
+
+function openModal(q){
+  modalTitle.textContent = q.title;
+  modalSubtitle.textContent = `کد آزمون: ${q.id} • برچسب‌ها: ${q.tags.join('، ')}`;
+  modalBody.innerHTML = `<p style="margin:0 0 8px">${escapeHtml(q.details)}</p>
+    <ul style="margin:8px 0 0;padding-inline-start:18px;color:var(--muted)">
+      <li>تعداد سوال: 20</li>
+      <li>زمان پیشنهادی: 15 دقیقه</li>
+      <li>نوع: چهارگزینه‌ای</li>
+    </ul>`;
+  modalStart.href = q.href;
+  modalBackdrop.classList.add('show');
+  modalBackdrop.setAttribute('aria-hidden','false');
+  modalClose.focus();
+}
+function closeModal(){
+  modalBackdrop.classList.remove('show');
+  modalBackdrop.setAttribute('aria-hidden','true');
+}
+
+/* theme handling: toggle, persist, init from system */
+function setTheme(isDark){
+  if(isDark) document.documentElement.classList.add('dark');
+  else document.documentElement.classList.remove('dark');
+  themeToggle.setAttribute('aria-pressed', String(isDark));
+  themeToggle.textContent = isDark ? 'حالت روشن' : 'حالت تاریک';
+  try{ localStorage.setItem('quizly_theme_dark', isDark ? '1' : '0'); }catch(e){}
+}
+themeToggle.addEventListener('click', ()=>{
+  const isDark = !document.documentElement.classList.contains('dark');
+  setTheme(isDark);
+});
+
+/* initialize theme: prefer saved, else system preference */
+(function initTheme(){
+  try{
+    const saved = localStorage.getItem('quizly_theme_dark');
+    if(saved === '1'){ setTheme(true); return; }
+    if(saved === '0'){ setTheme(false); return; }
+  }catch(e){}
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  setTheme(prefersDark);
+})();
+
+/* accessibility: info button Enter key */
+listEl.addEventListener('keydown', (e)=>{
+  if(e.key==='Enter' && e.target.matches('.info')) e.target.click();
+});
+
+/* initial render */
+render(quizzes);
+
+/* preserve scroll */
+if(sessionStorage.getItem('panelScroll')) panel.scrollTop = Number(sessionStorage.getItem('panelScroll'));
+panel.addEventListener('scroll', ()=> sessionStorage.setItem('panelScroll', String(panel.scrollTop)));
+</script>
 </body>
 </html>
