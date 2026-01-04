@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>آزمون – حالت پاسخنامه</title>
+    <style>
+        :root {
+            --pink: #fa4779;
+            --pink2: #ff7aa6;
+            --pink-soft: rgba(250, 71, 121, 0.12);
+            --bg: #f6f7fb;
+            --card: #ffffff;
+            --text: #0f172a;
+            --border: #e5e7eb;
+            --correct: #7fd1b9;
+        }
+        body.dark {
+            --bg: #0b1020;
+            --card: #131a33;
+            --text: #e5e7eb;
+            --border: #263056;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: 'Vazirmatn', Tahoma, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        .theme-toggle {
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            z-index: 10;
+        }
+        .wrapper {
+            max-width: 1200px;
+            margin: 70px auto;
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            gap: 26px;
+        }
+        .card, .sheet {
+            background: var(--card);
+            border-radius: 28px;
+            padding: 28px;
+            box-shadow: 0 25px 55px rgba(0, 0, 0, 0.18);
+        }
+        .progress-wrap {
+            height: 12px;
+            background: linear-gradient(90deg, #eee, #ddd);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-bottom: 28px;
+        }
+        .progress {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(135deg, var(--pink), var(--pink2));
+            transition: .4s;
+        }
+        .question {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 28px;
+        }
+        .options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+        }
+        .option {
+            padding: 18px;
+            border-radius: 22px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            text-align: center;
+            font-weight: 600;
+            transition: background .3s, border-color .3s;
+        }
+        .option:hover {
+            background: var(--pink-soft);
+            border-color: var(--pink);
+        }
+        .next {
+            margin-top: 28px;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 22px;
+            background: linear-gradient(135deg, var(--pink), var(--pink2));
+            color: #fff;
+            cursor: pointer;
+            display: none;
+            font-size: 16px;
+            transition: background .3s;
+        }
+        .next:hover {
+            background: var(--pink2);
+        }
+        .sheet {
+            max-height: 620px;
+            overflow: auto;
+        }
+        .sheet-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+        }
+        .sheet-cell {
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 12px;
+            display: grid;
+            grid-template-columns: 32px 1fr;
+            gap: 10px;
+        }
+        .sheet-cell.active {
+            border-color: var(--pink);
+            box-shadow: 0 0 0 3px var(--pink-soft);
+        }
+        .answers {
+            display: flex;
+            justify-content: space-between;
+        }
+        .bubble {
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 13px;
+        }
+        .correct {
+            background: var(--correct);
+            color: #fff;
+            border: none;
+        }
+        .wrong {
+            background: var(--pink);
+            color: #fff;
+            border: none;
+        }
+        .result {
+            text-align: center;
+            margin-top: 40px;
+        }
+        .score {
+            font-size: 48px;
+            font-weight: 900;
+            color: var(--pink);
+        }
+        .desc {
+            margin-top: 10px;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .print {
+            margin-top: 24px;
+            padding: 14px 34px;
+            border-radius: 999px;
+            border: none;
+            background: #111;
+            color: #fff;
+            cursor: pointer;
+            font-size: 15px;
+            transition: background .3s;
+        }
+        .print:hover {
+            background: #333;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .table th, .table td {
+            border: 1px solid var(--border);
+            padding: 10px;
+            text-align: center;
+        }
+        .table th {
+            background: var(--pink);
+            color: #fff;
+        }
+        .table td.correct {
+            background: #7fd1b9;
+        }
+        .table td.wrong {
+            background: #fa4779;
+        }
+        @media print {
+            .theme-toggle, .next { display: none; }
+            body { background: #fff; }
+        }
+        .quizly-logo{
+  position: fixed;
+  top: 16px;
+  right: 18px;
+  z-index: 999;
+}
+
+.quizly-logo img{
+  width: 74px; /* اندازه منطقی، نه ریز نه گنده */
+  cursor: pointer;
+  animation: quizlyFloat 4s ease-in-out infinite;
+  filter: drop-shadow(0 10px 28px rgba(250,71,121,.55));
+  transition: transform .35s ease, filter .35s ease;
+}
+
+.quizly-logo img:hover{
+  transform: scale(1.12) rotate(3deg);
+  filter: drop-shadow(0 16px 40px rgba(250,71,121,.85));
+}
+
+@keyframes quizlyFloat{
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+
+    </style>
+</head>
+<body>
+<div class="quizly-logo">
+  <img src="https://uploadkon.ir/uploads/7e2d29_25Quizly.png" alt="Quizly Logo">
+</div>
+
+<button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+
+<div class="wrapper">
+    <div class="card">
+        <div class="progress-wrap">
+            <div class="progress" id="progress"></div>
+        </div>
+        <div id="quiz"></div>
+        <button class="next" id="nextBtn" onclick="next()">بعدی</button>
+        <div class="result" id="result"></div>
+    </div>
+    <div class="sheet">
+        <div class="sheet-grid" id="sheet"></div>
+    </div>
+</div>
+
+<script>
+const questions = [
+  {
+    q: "پایه و اساس علمی روان درمانی و مشاوره چیست؟",
+    options: ["اصول و مفاهیم پایه", "نظریه های روان درمانی", "مهارت و تخصص", "روش های درمانی"],
+    answer: 1
+  },
+  {
+    q: "بر اساس تحقیقات، چند درصد نتایج مثبت درمان به عوامل غیردرمانی بستگی دارد؟",
+    options: ["۲۰ درصد", "۲۵ درصد", "۳۰ درصد", "۳۵ درصد"],
+    answer: 2
+  },
+  {
+    q: "در نظریه فروید، سطح ناهشیار از چه ویژگی‌هایی برخوردار است؟",
+    options: ["خودآگاهی", "نیمه‌هشیاری", "فعالیت و پویایی", "کنترل اراده"],
+    answer: 2
+  },
+  {
+    q: "در رویکرد روان‌درمانی، تقویت چه عاملی برای کنجکاوی و اکتشاف مهم است؟",
+    options: ["همانندسازی", "انتقال", "همدلی", "تحلیل"],
+    answer: 0
+  },
+  {
+    q: "در نظریه روان‌کاوی، نهاد معمولاً در کدام سطح قرار دارد؟",
+    options: ["هشیاری", "نیمه‌هشیاری", "ناهشیاری", "همه سطوح"],
+    answer: 2
+  },
+  {
+    q: "کدام مکانیسم دفاعی به صورت ناخودآگاه عمل می‌کند؟",
+    options: ["انکار", "تصعید", "فرافکنی", "واپس‌زنی"],
+    answer: 3
+  },
+  {
+    q: "فروید معتقد بود که بسیاری از رفتارها از کدام بخش نشأت می‌گیرند؟",
+    options: ["فرامن", "من", "نهاد", "مکانیسم‌های دفاعی"],
+    answer: 2
+  },
+  {
+    q: "کدام انتقال در روان‌کاوی برای پیشرفت درمان ضروری است؟",
+    options: ["انتقال مثبت", "انتقال منفی", "انتقال متقابل", "انتقال مقاومتی"],
+    answer: 0
+  },
+  {
+    q: "کدام نظریه‌پرداز بیشتر بر نقش 'من' تأکید داشت؟",
+    options: ["فروید", "آدلر", "یونگ", "اریکسون"],
+    answer: 1
+  },
+  {
+    q: "در روان‌درمانی پویشی کوتاه‌مدت، هدف اصلی چیست؟",
+    options: ["تغییر عمیق شخصیت", "حل تعارضات ناهشیار", "کاهش علائم", "درمان بلندمدت"],
+    answer: 2
+  },
+  {
+    q: "نظریه روابط موضوعی بیشتر توسط چه کسی مطرح شده است؟",
+    options: ["فروید", "کلاین", "آدلر", "راجرز"],
+    answer: 1
+  },
+  {
+    q: "در روان‌شناسی 'من'، کدام نظریه‌پرداز تحقیقات گسترده‌ای انجام داد؟",
+    options: ["اریکسون", "بالبی", "کلاین", "آدلر"],
+    answer: 0
+  },
+  {
+    q: "نظریه راجرز بر چه اساسی استوار است؟",
+    options: ["روان‌کاوی", "شناختی", "انسان‌گرایی", "رفتارگرایی"],
+    answer: 2
+  },
+  {
+    q: "از دیدگاه راجرز، دو دفاع اصلی کدامند؟",
+    options: ["تحریف و انکار", "سرکوبی و تصعید", "فرافکنی و همانندسازی", "واپس‌زنی و جابجایی"],
+    answer: 0
+  },
+  {
+    q: "راجرز جهت‌گیری علیتی رفتار را چگونه می‌بیند؟",
+    options: ["خودمختارانه", "زیستی", "محیطی", "ناهشیار"],
+    answer: 0
+  },
+  {
+    q: "دیدگاه راجرز نسبت به انسان چیست؟",
+    options: ["جزءنگر", "کل‌نگر", "بدبین", "جبرگرا"],
+    answer: 1
+  },
+  {
+    q: "در هستی‌گرایی، مهم‌ترین اصل چیست؟",
+    options: ["آزادی", "مسئولیت", "معنا", "تنهایی"],
+    answer: 0
+  },
+  {
+    q: "ریشه فلسفی معنا درمانی از کجاست؟",
+    options: ["پدیدارشناسی", "اگزیستانسیالیسم", "عقل‌گرایی", "تجربه‌گرایی"],
+    answer: 1
+  },
+  {
+    q: "فرانکل در تحلیل رفتار بر چه چیزی تأکید دارد؟",
+    options: ["اهداف آینده", "شرایط حال", "گذشته", "تعامل حال و گذشته"],
+    answer: 0
+  },
+  {
+    q: "در معنا درمانی، حقیقت وجودی انسان بر چه اساسی تفسیر می‌شود؟",
+    options: ["مسئولیت‌پذیری", "جبر", "لذت", "اجتناب از رنج"],
+    answer: 0
+  },
+  {
+    q: "از دیدگاه فرانکل، پایه روان‌رنجوری چیست؟",
+    options: ["تعارض در ارزش‌ها", "شکست عاطفی", "فقدان معنا", "اضطراب وجودی"],
+    answer: 2
+  },
+  {
+    q: "کدام فن معنا درمانی برای اختلالات مرتبط با بازتاب مؤثر است؟",
+    options: ["بازتاب‌زدایی", "قصد متناقض", "حساسیت به معنا", "تعدیل نگرش"],
+    answer: 0
+  },
+  {
+    q: "از دیدگاه پرلز، شکاف بین حال و آینده باعث چه می‌شود؟",
+    options: ["اضطراب", "افسردگی", "وسواس", "ترس"],
+    answer: 0
+  },
+  {
+    q: "پرلز بر چه عاملی تأکید داشت؟",
+    options: ["چگونگی رفتار", "فنون درمانی", "تغییر درمانجو", "جزئیات رفتار"],
+    answer: 0
+  },
+  {
+    q: "خودانگیخته‌ترین محصول سازمان روانی از نظر پرلز چیست؟",
+    options: ["رؤیاها", "تعارض‌ها", "ادراکات", "تصاویر ذهنی"],
+    answer: 0
+  },
+  {
+    q: "در کدام نظریه، خشم تعیین‌کننده سلامت روان است؟",
+    options: ["گشتالت درمانی", "معنا درمانی", "شناخت درمانی", "روان‌کاوی"],
+    answer: 0
+  },
+  {
+    q: "از دیدگاه الیس، مبنای باورهای منطقی و غیرمنطقی چیست؟",
+    options: ["زیستی", "اجتماعی", "فلسفی", "شناختی"],
+    answer: 0
+  },
+  {
+    q: "در مدل الیس، درمان بر کدام مؤلفه متمرکز است؟",
+    options: ["B (باورها)", "A (رویداد فعال‌کننده)", "C (پیامدهای هیجانی)", "D (بحث و تردید)"],
+    answer: 0
+  },
+  {
+    q: "از دیدگاه بک، طرحواره‌های منفی جزئی از کدام بخش تفکر هستند؟",
+    options: ["ساختار تفکر", "محتوای فکر", "فرآیند تفکر", "شکل فکر"],
+    answer: 0
+  },
+  {
+    q: "کدام روش درمانی مانند واکسیناسیون عمل می‌کند؟",
+    options: ["روش الیس", "روش بک", "روش بوم", "روش راجرز"],
+    answer: 1
+  }
+];
+
+    let index = 0;
+    let correctCount = 0;
+    const userAnswers = Array(questions.length).fill(null);
+
+    const quiz = document.getElementById("quiz");
+    const sheet = document.getElementById("sheet");
+    const nextBtn = document.getElementById("nextBtn");
+    const progress = document.getElementById("progress");
+
+    function render() {
+        const q = questions[index];
+        quiz.innerHTML = `
+            <div class="question">${q.q}</div>
+            <div class="options">
+                ${q.options.map((o, i) => `<div class="option" onclick="select(${i})">${o}</div>`).join("")}
+            </div>`;
+        nextBtn.style.display = "none";
+        updateProgress();
+        renderSheet();
+    }
+
+    function updateProgress() {
+        progress.style.width = `${(index / questions.length) * 100}%`;
+    }
+
+    function renderSheet() {
+        sheet.innerHTML = questions.map((q, i) => {
+            const ua = userAnswers[i];
+            return `
+                <div class="sheet-cell ${i === index ? "active" : ""}">
+                    <b>${i + 1}</b>
+                    <div class="answers">
+                        ${["الف", "ب", "ج", "د"].map((l, j) => {
+                            let c = "";
+                            if (ua !== null) {
+                                c = j === q.answer ? "correct" : (j === ua ? "wrong" : "");
+                            }
+                            return `<div class="bubble ${c}">${l}</div>`;
+                        }).join("")}
+                    </div>
+                </div>`;
+        }).join("");
+    }
+
+    function select(i) {
+        if (userAnswers[index] !== null) return;
+        userAnswers[index] = i;
+        if (i === questions[index].answer) correctCount++;
+        nextBtn.style.display = "block";
+        renderSheet();
+    }
+
+    function next() {
+        index++;
+        if (index < questions.length) {
+            render();
+        } else {
+            finish();
+        }
+    }
+
+    function finish() {
+        progress.style.width = "100%";
+        const totalQuestions = questions.length;
+        const grade = ((correctCount / totalQuestions) * 20).toFixed(2);
+        const percentage = ((correctCount / totalQuestions) * 100).toFixed(2);
+        const answeredQuestions = userAnswers.filter(answer => answer !== null).length;
+        let desc = "";
+
+        if (grade >= 18) desc = "عالی و مسلط";
+        else if (grade >= 15) desc = "خوب";
+        else if (grade >= 12) desc = "قابل قبول";
+        else desc = "نیازمند تمرین جدی";
+
+        quiz.innerHTML = `
+            <div class="score">${grade} / ۲۰</div>
+            <div class="desc">${desc}</div>
+            <div>شما ${answeredQuestions} از ${totalQuestions} سوال را پاسخ داده‌اید. (${percentage}%)</div>
+            <button class="print" onclick="openPrintWindow()">آماده‌سازی جهت چاپ</button>
+        `;
+    }
+
+    function openPrintWindow() {
+        const printWindow = window.open('', '_blank');
+        printWindow.document.write(`
+            <html lang="fa" dir="rtl">
+            <head>
+                <meta charset="UTF-8">
+                <title>نتیجه آزمون</title>
+                <style>
+                    body { font-family: 'Vazirmatn', Tahoma, sans-serif; direction: rtl; }
+                    .result { text-align: center; margin: 20px; }
+                    .table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                    .table th, .table td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+                    .table th { background: var(--pink); color: #fff; }
+                    .table td.correct { background: #7fd1b9; }
+                    .table td.wrong { background: #fa4779; }
+                </style>
+            </head>
+            <body>
+                <div class="result">
+                    <h1>نتیجه آزمون</h1>
+                    <div class="score">${(correctCount / questions.length * 20).toFixed(2)} / ۲۰</div>
+                    <div>شما ${userAnswers.filter(answer => answer !== null).length} از ${questions.length} سوال را پاسخ داده‌اید.</div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>سوال</th>
+                                <th>پاسخ شما</th>
+                                <th>پاسخ صحیح</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${questions.map((q, i) => `
+                                <tr>
+                                    <td>${q.q}</td>
+                                    <td class="${userAnswers[i] === q.answer ? 'correct' : 'wrong'}">${["الف", "ب", "ج", "د"][userAnswers[i]] || 'پاسخ داده نشده'}</td>
+                                    <td>${["الف", "ب", "ج", "د"][q.answer]}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+        printWindow.close();
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle("dark");
+    }
+
+    render();
+</script>
+
+</body>
+</html>
